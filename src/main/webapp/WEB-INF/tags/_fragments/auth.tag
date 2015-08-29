@@ -15,7 +15,7 @@
 		<form:form id="topBarLogoutForm" action="${logoutUrl}" method="post">
 			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 		</form:form>
-		<spring:message code="global.welcome"/>&#44;&nbsp;${userName}&nbsp;
+		<spring:message code="global.welcome"/>&#44;&nbsp;<c:out value="${userName}"/>&nbsp;
 		&#40;
 		<span id="logoutAction"><spring:message code="global.logout"/></span>
 		&#41;	
