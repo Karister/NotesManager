@@ -136,8 +136,8 @@ public class NoteController extends AbstractController {
 		model.addAttribute(NoteControllerConstants.ModelAttrKeys.View.PAGINATION, paginationData);
 		
 		preparePage(paginationData, model);
-		populateEntriesPerPage(model);
-		displayInfoIfNoNotes(model, paginationData);
+		populateModelWithEntriesPerPage(model);
+		displayInfoIfNoNotesFound(model, paginationData);
 		
 		return NoteControllerConstants.Pages.NOTES_LISTING_PAGE;
 	}
@@ -153,7 +153,7 @@ public class NoteController extends AbstractController {
 		dateFilterForm.setTo(pagination.getDeadlineFilter().getTo());
 		model.addAttribute(DATE_FILTER_FORM, dateFilterForm);
 		
-		populateEntriesPerPage(model);
+		populateModelWithEntriesPerPage(model);
 	}
 	
 	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {DATE_FILTER_FROM, DATE_FILTER_TO})
@@ -183,31 +183,31 @@ public class NoteController extends AbstractController {
 		}
 				
 		model.addAttribute(PAGINATION, paginationData);
-		populateEntriesPerPage(model);
-		displayInfoIfNoNotes(model, paginationData);
+		populateModelWithEntriesPerPage(model);
+		displayInfoIfNoNotesFound(model, paginationData);
 		
 		return NOTES_LISTING_PAGE;
 	}
 	
-	private void displayInfoIfNoNotes(final Model model, NotesPaginationData pagination) {
+	private void displayInfoIfNoNotesFound(final Model model, NotesPaginationData pagination) {
 		if(pagination.getPage().getNumberOfElements() == 0) {
 			GlobalMessages.addWarningMessage("notes.listing.msg.noResults", model);
 		}
 	}
 	
 	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {CLEAR_DATE_FILTER_PARAM})
-	public String clearDateFilter(@RequestParam(CLEAR_DATE_FILTER_PARAM) String mode) {
+	public String clearDateFilter(@RequestParam(CLEAR_DATE_FILTER_PARAM) String mode,
+			Model model, HttpServletRequest request) {
 		
 		noteFacade.clearDateFilter(mode);
 		noteFacade.updatePageNumber(DEFAULT_FIRST_PAGE);
 		
-		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
+		return listNotes(request, model);
 	}
 	
 	@RequestMapping(value = ADD_NOTE, method = RequestMethod.GET)
 	public String showNewNotePage(@ModelAttribute(NOTE_FORM) NoteForm note,
-			final Model model,
-			HttpServletRequest request) {
+			final Model model, final HttpServletRequest request) {
 		
 		createAddNotePageBreadcrumbs(model);
 		
@@ -312,7 +312,7 @@ public class NoteController extends AbstractController {
 				dateFilterForm.setFrom(pagination.getDeadlineFilter().getFrom());
 				dateFilterForm.setTo(pagination.getDeadlineFilter().getTo());
 				GlobalMessages.addErrorMessage("notes.delete.msg.nothingSelected", model);
-				populateEntriesPerPage(model);
+				populateModelWithEntriesPerPage(model);
 				return NOTES_LISTING_PAGE;
 			}
 			deletedNotesCount = Integer.toString(selectedCheckboxesForm.getSelections().size());
@@ -350,7 +350,7 @@ public class NoteController extends AbstractController {
 		sessionPagesData.setSelectedNotesIds(ids);
 	}
 	
-	private void populateEntriesPerPage(Model model) {
+	private void populateModelWithEntriesPerPage(Model model) {
 		model.addAttribute(NoteControllerConstants.ModelAttrKeys.View.PAGE_SIZES, notesPageSizes);
 	}
 	
