@@ -22,7 +22,7 @@
 			authentication-failure-url="/login?error" 
 			username-parameter="nick"
 			password-parameter="password"
-			authentication-success-handler-ref="notesManagerSuccessHandler"/>
+			authentication-success-handler-ref="notesManagerLoginSuccessHandler"/>
 		<logout logout-url="/j_spring_security_logout" logout-success-url="/logout" />
 		<csrf/>
 	</http>
@@ -41,7 +41,7 @@
 		<beans:property name="userService" ref="userService" />
 	</beans:bean>
 	
-	<beans:bean id="notesManagerSuccessHandler" class="pl.arczynskiadam.security.impl.NotesManagerLoginSuccessHandler">
+	<beans:bean id="notesManagerLoginSuccessHandler" class="pl.arczynskiadam.security.impl.NotesManagerLoginSuccessHandler">
 		<beans:property name="defaultTargetUrl" value="/notesmanager/show" />
 	</beans:bean>
 	
