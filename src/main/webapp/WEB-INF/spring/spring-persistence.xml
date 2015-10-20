@@ -27,7 +27,7 @@
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="persistenceUnitName" value="hibernatePersistenceUnit" />
-		<property name="packagesToScan" value="pl.arczynskiadam.core.model" />
+		<property name="packagesToScan" value="pl.arczynskiadam.notesmanager.core.model" />
 	    <property name="jpaVendorAdapter">
 	        <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" >
 <!-- 	        	<property name="generateDdl" value="false" /> -->
@@ -48,6 +48,6 @@
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
 	
-	<jpa:repositories base-package="pl.arczynskiadam.core.dao" />
+	<jpa:repositories base-package="pl.arczynskiadam.notesmanager.core.dao" />
 
 </beans>

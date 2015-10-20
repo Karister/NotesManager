@@ -5,10 +5,10 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
     					http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
    
-	<bean id="selectedNotesValidator" class="pl.arczynskiadam.web.form.validation.SelectedCheckboxesValidator">
+	<bean id="selectedNotesValidator" class="pl.arczynskiadam.notesmanager.web.form.validation.SelectedCheckboxesValidator">
 		<property name="errCode" value="NotesSelectionForm.ids.NoneSelected" />
 	</bean>
-   	<bean id="dateFilterValidator" class="pl.arczynskiadam.web.form.validation.DateFilterValidator">
+   	<bean id="dateFilterValidator" class="pl.arczynskiadam.notesmanager.web.form.validation.DateFilterValidator">
    		<property name="bothEmptyErrCode" value="DateFilter.dates.empty" />
    		<property name="switchedDatesErrCode" value="DateFilter.dates.switched" />
    	</bean>

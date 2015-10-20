@@ -11,7 +11,7 @@
 	<uri>http://arczynskiadam.pl/jsp/tlds/utils</uri>
 	<function>
         <name>now</name>
-        <function-class>pl.arczynskiadam.web.function.UtilFunctions</function-class>
+        <function-class>pl.arczynskiadam.notesmanager.web.function.UtilFunctions</function-class>
         <function-signature>java.time.LocalDateTime now()</function-signature>
     </function>
 </taglib>

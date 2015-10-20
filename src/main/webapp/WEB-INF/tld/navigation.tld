@@ -11,7 +11,7 @@
 	<uri>http://arczynskiadam.pl/jsp/tlds/navigation</uri>
 	<tag>
 	    <name>breadcrumbs</name>
-	    <tag-class>pl.arczynskiadam.web.tag.navigation.BreadcrumbsTag</tag-class>
+	    <tag-class>pl.arczynskiadam.notesmanager.web.tag.navigation.BreadcrumbsTag</tag-class>
 	    <body-content>empty</body-content>
 	    <attribute>
 		    <name>items</name>
@@ -21,7 +21,7 @@
 	</tag>
 	<tag>
 	    <name>sortHeader</name>
-	    <tag-class>pl.arczynskiadam.web.tag.navigation.SortHeaderTag</tag-class>
+	    <tag-class>pl.arczynskiadam.notesmanager.web.tag.navigation.SortHeaderTag</tag-class>
 	    <body-content>scriptless</body-content>
 	    <attribute>
 		    <name>sortColumn</name>
