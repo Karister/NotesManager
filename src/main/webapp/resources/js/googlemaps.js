@@ -12,16 +12,12 @@ GoogleMapScripts = {
 		return map;
 	},
 	
-	codeLatLng: function(latlng, callback) {
+	codeLatLng: function(latlng) {
 		var map = this.createMap(false);
 		var geocoder = new google.maps.Geocoder();
 		var infowindow = new google.maps.InfoWindow();
 		var marker = this.createMarker(map);
-		if (callback) {
-			var input = this.createPacInput();
-			var autocomplete = this.createAutocomplete(map, input);
-			map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-		}
+		
 		geocoder.geocode({
 			'latLng' : latlng
 		}, function(results, status) {
@@ -42,9 +38,6 @@ GoogleMapScripts = {
 			}
 		});
 		
-		if (callback) {
-			this.addAutocompleteListener(map, autocomplete, infowindow, marker, callback);
-		}
 		return map;
 	},
 	
