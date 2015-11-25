@@ -57,6 +57,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.arczynskiadam.notesmanager.core.model.NoteModel;
+import pl.arczynskiadam.notesmanager.utils.collections.Utils;
 import pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants;
 import pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants;
 import pl.arczynskiadam.notesmanager.web.data.DateFilterData;
@@ -142,15 +143,16 @@ public class NoteController extends AbstractController {
 		return NoteControllerConstants.Pages.NOTES_LISTING_PAGE;
 	}
 
-	private void preparePage(NotesPaginationData pagination, Model model)
+	private void preparePage(NotesPaginationData paginationData, Model model)
 	{
+		Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());
 		SelectedCheckboxesForm selectedCheckboxesForm = new SelectedCheckboxesForm();
-		selectedCheckboxesForm.setSelections(noteFacade.convertNotesIdsToSelections(pagination.getSelectedNotesIds()));
+		selectedCheckboxesForm.setSelections(selections);
 		model.addAttribute(SELECTED_CHECKBOXES_FORM, selectedCheckboxesForm);
 		
 		DateFilterForm dateFilterForm = new DateFilterForm();
-		dateFilterForm.setFrom(pagination.getDeadlineFilter().getFrom());
-		dateFilterForm.setTo(pagination.getDeadlineFilter().getTo());
+		dateFilterForm.setFrom(paginationData.getDeadlineFilter().getFrom());
+		dateFilterForm.setTo(paginationData.getDeadlineFilter().getTo());
 		model.addAttribute(DATE_FILTER_FORM, dateFilterForm);
 		
 		populateModelWithEntriesPerPage(model);
@@ -168,7 +170,10 @@ public class NoteController extends AbstractController {
 		if (result.hasErrors()) {
 			paginationData = noteFacade.prepareNotesPaginationData();
 			model.addAttribute(PAGINATION, paginationData);
-			selectedCheckboxesForm.setSelections(noteFacade.convertNotesIdsToSelections(paginationData.getSelectedNotesIds()));
+			
+			Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());
+			selectedCheckboxesForm.setSelections(selections);
+			
 			for (ObjectError e : result.getAllErrors()) {
 				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.switched")) {
 					GlobalMessages.addErrorMessage("DateFilter.dates.switched", model);
@@ -304,7 +309,7 @@ public class NoteController extends AbstractController {
 		
 		if ("all".equals(delete)) {
 			deletedNotesCount = Integer.toString(noteFacade.getNotesCountForRegisteredUser(userFacade.getCurrentUser().getNick())); 
-			noteFacade.deleteNotes(userFacade.getCurrentUser());
+			noteFacade.deleteAllNotesForCurrentUser();
 		} else if ("selected".equals(delete)) {
 			if (result.hasErrors()) {
 				NotesPaginationData pagination = noteFacade.prepareNotesPaginationData();
@@ -316,7 +321,8 @@ public class NoteController extends AbstractController {
 				return NOTES_LISTING_PAGE;
 			}
 			deletedNotesCount = Integer.toString(selectedCheckboxesForm.getSelections().size());
-			Set<Integer> ids = noteFacade.convertSelectionsToNotesIds(selectedCheckboxesForm.getSelections());
+			
+			Set<Integer> ids = Utils.mapStringSetToIntSet(selectedCheckboxesForm.getSelections());
 			noteFacade.deleteNotes(ids);
 		}
 		
@@ -346,7 +352,7 @@ public class NoteController extends AbstractController {
 		log.debug("checboxes vals to update from ajax: " + selectedCheckboxesForm.toString());
 		
 		NotesPaginationData sessionPagesData = noteFacade.prepareNotesPaginationData();
-		Set<Integer> ids = noteFacade.convertSelectionsToNotesIds(selectedCheckboxesForm.getSelections());
+		Set<Integer> ids = Utils.mapStringSetToIntSet(selectedCheckboxesForm.getSelections());
 		sessionPagesData.setSelectedNotesIds(ids);
 	}
 	

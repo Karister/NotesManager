@@ -2,7 +2,6 @@ package pl.arczynskiadam.notesmanager.core.service.impl;
 
 import static pl.arczynskiadam.notesmanager.core.service.constants.ServiceConstants.Session.Attributes.NOTES_PAGINATION;
 
-import java.awt.geom.IllegalPathStateException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 

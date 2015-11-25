@@ -9,9 +9,6 @@ import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstant
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,7 +17,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Sets;
 
 import pl.arczynskiadam.notesmanager.core.model.NoteModel;
-import pl.arczynskiadam.notesmanager.core.model.RegisteredUserModel;
 import pl.arczynskiadam.notesmanager.core.model.UserModel;
 import pl.arczynskiadam.notesmanager.core.service.NoteService;
 import pl.arczynskiadam.notesmanager.core.service.SessionService;
@@ -228,16 +224,7 @@ public class DefaultNoteFacade implements NoteFacade {
 	
 	@Override
 	public void deleteNote(int id) {
-		deleteNotes(Sets.newHashSet(id));
-	}
-	
-	@Override
-	public void deleteNotes(int[] ids) {
-		HashSet<Integer> toDelete = new HashSet<>();
-		for (int id : ids) {
-			toDelete.add(new Integer(id));
-		}
-		deleteNotes(toDelete);
+		deleteNotes(Sets.newHashSet(Integer.valueOf(id)));
 	}
 	
 	@Override
@@ -253,24 +240,15 @@ public class DefaultNoteFacade implements NoteFacade {
 	}
 	
 	@Override
-	public void deleteNotes(RegisteredUserModel user) {
-		noteService.deleteUserNotes(user.getId());
+	public void deleteAllNotesForCurrentUser() {
+		int currentuserId = userService.getCurrentUser().getId();
+		noteService.deleteUserNotes(currentuserId);
 		removePaginationDataFromSession();
 	}
 	
 	@Override
 	public void removePaginationDataFromSession() {
 		sessionService.getCurrentSession().removeAttribute(NoteControllerConstants.ModelAttrKeys.View.PAGINATION);
-	}
-	
-	@Override
-	public Set<Integer> convertSelectionsToNotesIds(Collection<String> selections) {
-		return selections.stream().map(s -> Integer.parseInt(s)).collect(Collectors.toSet());
-	}
-	
-	@Override
-	public Set<String> convertNotesIdsToSelections(Collection<Integer> ids) {
-		return ids.stream().map(i -> Integer.toString(i)).collect(Collectors.toSet());
 	}
 
 	@Override
