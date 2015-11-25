@@ -9,19 +9,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 
 import pl.arczynskiadam.notesmanager.core.model.RegisteredUserModel;
-import pl.arczynskiadam.notesmanager.core.model.RegisteredUserModel_;
 import pl.arczynskiadam.notesmanager.core.model.UserModel;
 
 public class UserSpecs {
-	
-	public static Specification<RegisteredUserModel> byNick(final String userNick) {
-		return new Specification<RegisteredUserModel>() {
-            @Override
-            public Predicate toPredicate(Root<RegisteredUserModel> userRoot, CriteriaQuery<?> query, CriteriaBuilder cb) {             
-                return cb.equal(userRoot.<String>get(RegisteredUserModel_.nick), userNick);
-            }
-		};
-	}
 	
 	public static Specification<UserModel> registered() {
 		return new Specification<UserModel>() {

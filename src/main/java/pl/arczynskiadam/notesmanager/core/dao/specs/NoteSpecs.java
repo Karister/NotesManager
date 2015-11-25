@@ -1,5 +1,7 @@
 package pl.arczynskiadam.notesmanager.core.dao.specs;
 
+import static org.springframework.data.jpa.domain.Specifications.not;
+
 import java.time.LocalDate;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -11,11 +13,11 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 
 import pl.arczynskiadam.notesmanager.core.model.NoteModel;
 import pl.arczynskiadam.notesmanager.core.model.NoteModel_;
 import pl.arczynskiadam.notesmanager.core.model.RegisteredUserModel;
+import pl.arczynskiadam.notesmanager.core.model.UserModel;
 import pl.arczynskiadam.notesmanager.core.model.UserModel_;
 
 public class NoteSpecs {
@@ -58,20 +60,16 @@ public class NoteSpecs {
 	
 	public static Specification<NoteModel> anonymous()
 	{
-		return Specifications.not(registered());
+		return not(registered());
 	}
 	
-	public static Specification<NoteModel> forNick(final String userNick)
+	public static Specification<NoteModel> forUser(final UserModel user)
 	{
 		return new Specification<NoteModel>() {
             @Override
             public Predicate toPredicate(Root<NoteModel> noteRoot, CriteriaQuery<?> query, CriteriaBuilder cb) {
-            	final Subquery<Integer> personQuery = query.subquery(Integer.class);
-				final Root<RegisteredUserModel> person = personQuery.from(RegisteredUserModel.class);
-				final Join<RegisteredUserModel, NoteModel> notes = person.join(UserModel_.notes);
-				personQuery.select(notes.<Integer> get(NoteModel_.id));
-				personQuery.where(cb.equal(person.<String> get(UserModel_.nick), userNick));
-				return cb.in(noteRoot.get(NoteModel_.id)).value(personQuery);
+            	Path<UserModel> author = noteRoot.<UserModel> get(NoteModel_.author);
+				return cb.equal(author, user);
             }
 		};
 	}

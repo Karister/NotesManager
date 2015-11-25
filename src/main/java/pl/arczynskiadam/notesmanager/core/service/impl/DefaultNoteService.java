@@ -76,7 +76,7 @@ public class DefaultNoteService implements NoteService {
 	public void updateNote(NoteModel note) {
 		RegisteredUserModel currentUser = userService.getCurrentUser();
 		if (!note.getAuthor().equals(currentUser)) {
-			throw new IllegalPathStateException("global.error.userNotOwnerOfNote");
+			throw new IllegalStateException("global.error.userNotOwnerOfNote");
 		}
 		note.setLastModified(LocalDateTime.now());
 		noteDAO.save(note);
@@ -93,7 +93,7 @@ public class DefaultNoteService implements NoteService {
 	}
 
 	private Page<NoteModel> ListNotesForRegisteredUser(int pageId, int pageSize, String sortCol, boolean asc, RegisteredUserModel currentUser) {
-		return noteDAO.findAll(NoteSpecs.forNick(currentUser.getNick()),
+		return noteDAO.findAll(NoteSpecs.forUser(currentUser),
 				constructPageSpecification(keepPageNumberInRange(pageId, pageSize, currentUser), pageSize, sortCol, asc));
 	}
 	
@@ -107,7 +107,7 @@ public class DefaultNoteService implements NoteService {
 	}
 
 	private int keepPageNumberInRange(int pageId, int pageSize, RegisteredUserModel currentUser) {
-		int notesCount = (int) noteDAO.count(NoteSpecs.forNick(currentUser.getNick()));
+		int notesCount = (int) noteDAO.count(NoteSpecs.forUser(currentUser));
 		if (pageId > notesCount / pageSize) {
 			pageId = notesCount / pageSize;
 		}
@@ -131,7 +131,7 @@ public class DefaultNoteService implements NoteService {
 		if (currentUser == null) {
 			spec = Specifications.where(NoteSpecs.anonymous());
 		} else {
-			spec = Specifications.where(NoteSpecs.forNick(currentUser.getNick()));
+			spec = Specifications.where(NoteSpecs.forUser(currentUser));
 		}
 		
 		if (dateFilter.getFrom() != null) {
@@ -153,7 +153,8 @@ public class DefaultNoteService implements NoteService {
 	@Override
 	@Transactional
 	public int getNotesCountForRegisteredUser(String userNick) {
-		return (int) noteDAO.count(NoteSpecs.forNick(userNick));
+		RegisteredUserModel user = userService.findRegisteredUserByNick(userNick);
+		return (int) noteDAO.count(NoteSpecs.forUser(user));
 	}
 	
 	@Override
