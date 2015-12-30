@@ -7,11 +7,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<%@ taglib prefix="template" tagdir="/WEB-INF/tags/_templates" %>
+<%@ taglib prefix="fragment" tagdir="/WEB-INF/tags/_fragments" %>
 <%@ taglib prefix="notes" tagdir="/WEB-INF/tags/notes" %>
-<%@ taglib prefix="utils" uri="http://arczynskiadam.pl/jsp/tlds/utils" %>
 
 <!DOCTYPE html>
 <html>
@@ -48,21 +46,13 @@
 </head>
 <body>
 	<div id="placeholder"></div>
-	<template:header>
-		<jsp:attribute name="topBarContent">
-			<jsp:invoke fragment="topBarContent" />
-			<div class="dateHolder">
-				<fmt:parseDate value="${utils:now()}" pattern="yyyy-MM-dd" var="parsedDate" type="date" />
-				<fmt:formatDate value="${parsedDate}" type="date" pattern="dd/MM/yyyy" />
-			</div>
-		</jsp:attribute>
-	</template:header>
+	<fragment:header />
 	<div class="master">
 		<div class="page">
 			<jsp:doBody />
 		</div>
 	</div>
-	<template:footer />
+	<fragment:footer />
 </body>
 </html>
 

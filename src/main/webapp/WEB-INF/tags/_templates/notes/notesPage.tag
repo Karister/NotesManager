@@ -26,13 +26,6 @@
 		<jsp:invoke fragment="additionalJS" />
 	</jsp:attribute>
 	
-	<jsp:attribute name="topBarContent">
-		<fragment:auth showRegisterLink="true" />
-		<span id="onlineCounter">
-			<spring:message code="global.usersOnline"/>:&nbsp;${usersOnline}
-		</span>
-	</jsp:attribute>
-	
 	<jsp:body>
 		<div class="notes">
 			<jsp:invoke fragment="banner" />

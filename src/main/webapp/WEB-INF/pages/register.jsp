@@ -10,9 +10,6 @@
 <%@ taglib prefix="banner" tagdir="/WEB-INF/tags/_templates"%>
 
 <template:notesPage>
-	<jsp:attribute name="topBarContent">
-		<fragment:auth showRegisterLink="false" />
-	</jsp:attribute>
 	
 	<jsp:attribute name="banner">
 		<banner:banner bannerClass="details">

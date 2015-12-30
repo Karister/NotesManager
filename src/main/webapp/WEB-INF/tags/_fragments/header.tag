@@ -1,11 +1,12 @@
-<%@ tag body-content="scriptless" pageEncoding="UTF-8"%>
-
-<%@ attribute name="topBarContent" fragment="true" %>
+<%@ tag body-content="empty" pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="navigation" uri="http://arczynskiadam.pl/jsp/tlds/navigation" %>
 <%@ taglib prefix="fragment" tagdir="/WEB-INF/tags/_fragments" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<%@ taglib prefix="utils" uri="http://arczynskiadam.pl/jsp/tlds/utils" %>
 
 <spring:theme code="theme.name" var="currentTheme"/>
 
@@ -15,7 +16,14 @@
 		
 <header class="top">
 	<div class="topbar">
-		<jsp:invoke fragment="topBarContent"/>
+		<fragment:auth/>
+		<span id="onlineCounter">
+			<spring:message code="global.usersOnline"/>:&nbsp;${usersOnline}
+		</span>
+		<div class="dateHolder">
+			<fmt:parseDate value="${utils:now()}" pattern="yyyy-MM-dd" var="parsedDate" type="date" />
+			<fmt:formatDate value="${parsedDate}" type="date" pattern="dd/MM/yyyy" />
+		</div>
 	</div>
 	<div class="menu">
 		<nav class="buttonsBar">
