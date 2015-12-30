@@ -24,6 +24,7 @@ public class LoginController extends AbstractController {
 	
 	@RequestMapping(value = LoginControllerConstants.URLs.LOGIN, method = RequestMethod.GET)
 	public String login(@RequestParam(value = "error", required = false) String error,
+			@RequestParam(value = "invalidated", required = false) String invalidated,
 			@ModelAttribute(LOGIN_FORM) LoginForm loginForm,
 			Model model) {
 
@@ -33,6 +34,10 @@ public class LoginController extends AbstractController {
 		
 		if (error != null) {
 			GlobalMessages.addErrorMessage("login.failed", model);
+		}
+		
+		if (invalidated != null) {
+			GlobalMessages.addWarningMessage("global.logout.invalidated", model);
 		}
 
 		addDefaultBreadcrumbsToModel(model);

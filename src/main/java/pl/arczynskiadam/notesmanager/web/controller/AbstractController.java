@@ -17,6 +17,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -36,6 +37,9 @@ public abstract class AbstractController {
 	
 	@Resource(name = "messageSource")
 	protected MessageSource messageSource;
+	
+	 @Resource(name="sessionRegistry")
+	 private SessionRegistryImpl sessionRegistry;
 	
 	protected void createBreadcrumpAndSaveToModel(Model model, BreadcrumbsItem... items) {
 		ArrayList<BreadcrumbsItem> navItems = new ArrayList<BreadcrumbsItem>();
@@ -79,5 +83,10 @@ public abstract class AbstractController {
 	@ModelAttribute(value = "usersOnline")
 	public int getusersOnline() {
 		return SessionCounter.getTotalActiveSession();
+	}
+	
+	@ModelAttribute(value = "loggedinUsersOnline")
+	public int getLoggedinUersOnline() {
+		return sessionRegistry.getAllPrincipals().size();
 	}
 }

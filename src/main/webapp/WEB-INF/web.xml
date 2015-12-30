@@ -79,10 +79,13 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
-	<!-- Session Listener -->
+	<!-- Session Listeners -->
 	<listener>
 		<listener-class>pl.arczynskiadam.notesmanager.security.impl.SessionCounter</listener-class>
 	</listener>
+	<listener>
+    	<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+	</listener> 
 	
 	<!-- TLDs -->
 	<jsp-config>

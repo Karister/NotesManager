@@ -18,7 +18,7 @@
 	<div class="topbar">
 		<fragment:auth/>
 		<span id="onlineCounter">
-			<spring:message code="global.usersOnline"/>:&nbsp;${usersOnline}
+			<spring:message code="global.usersOnline" arguments="${usersOnline},${loggedinUsersOnline}"/>
 		</span>
 		<div class="dateHolder">
 			<fmt:parseDate value="${utils:now()}" pattern="yyyy-MM-dd" var="parsedDate" type="date" />

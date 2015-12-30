@@ -10,9 +10,15 @@
  	
  	<http pattern="/resources/**" security="none"/>
 	
-	<http disable-url-rewriting="true" pattern="/**">
+	<http disable-url-rewriting="true" pattern="/**" auto-config="false">
 
-		<session-management session-fixation-protection="migrateSession"/>
+		<session-management session-fixation-protection="migrateSession">
+			<concurrency-control
+				max-sessions="1"
+				error-if-maximum-exceeded="false"
+				expired-url="/login?invalidated"
+				session-registry-alias="sessionRegistry"/>
+		</session-management>
 		
 		<intercept-url pattern="/**" requires-channel="https"/>
 		
@@ -23,9 +29,11 @@
 			username-parameter="nick"
 			password-parameter="password"
 			authentication-success-handler-ref="notesManagerLoginSuccessHandler"/>
-		<logout logout-url="/j_spring_security_logout" logout-success-url="/logout" />
+		<logout logout-url="/j_spring_security_logout" logout-success-url="/logout" invalidate-session="true" />
 		<csrf/>
 	</http>
+
+	<beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
  	<authentication-manager alias="authenticationManager">
 		 <authentication-provider user-service-ref="userDetailsService">
