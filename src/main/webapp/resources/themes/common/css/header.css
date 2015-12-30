@@ -21,6 +21,12 @@ header nav a
 {
 	display: inline-block;
 }
+header #onlineCounter
+{
+	font-family: Calibri;
+	color: #fff;
+	padding-left: 40px;
+}
 
 													/* Navigation */
 nav.buttonsBar

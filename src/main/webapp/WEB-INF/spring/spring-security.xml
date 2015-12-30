@@ -45,4 +45,6 @@
 		<beans:property name="defaultTargetUrl" value="/notesmanager/show" />
 	</beans:bean>
 	
+	<beans:bean id="defaultSessionCounter" class="pl.arczynskiadam.notesmanager.security.impl.SessionCounter" />
+	
 </beans:beans>

@@ -79,6 +79,11 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
+	<!-- Session Listener -->
+	<listener>
+		<listener-class>pl.arczynskiadam.notesmanager.security.impl.SessionCounter</listener-class>
+	</listener>
+	
 	<!-- TLDs -->
 	<jsp-config>
 		
@@ -95,5 +100,10 @@
 	        <page-encoding>UTF-8</page-encoding>
 	    </jsp-property-group>
   	</jsp-config>
+  	
+  	<!-- Session Timeout -->
+  	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
  
 </web-app>

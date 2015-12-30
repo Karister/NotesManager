@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import pl.arczynskiadam.notesmanager.security.impl.SessionCounter;
 import pl.arczynskiadam.notesmanager.web.tag.navigation.BreadcrumbsItem;
 
 public abstract class AbstractController {
@@ -73,5 +74,10 @@ public abstract class AbstractController {
 	@ModelAttribute(value = "locales")
 	public List<String> getLocales() {
 		return locales;
+	}
+	
+	@ModelAttribute(value = "usersOnline")
+	public int getusersOnline() {
+		return SessionCounter.getTotalActiveSession();
 	}
 }

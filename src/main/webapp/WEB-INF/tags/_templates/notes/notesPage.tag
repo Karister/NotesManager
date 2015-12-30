@@ -28,6 +28,9 @@
 	
 	<jsp:attribute name="topBarContent">
 		<fragment:auth showRegisterLink="true" />
+		<span id="onlineCounter">
+			<spring:message code="global.usersOnline"/>:&nbsp;${usersOnline}
+		</span>
 	</jsp:attribute>
 	
 	<jsp:body>
