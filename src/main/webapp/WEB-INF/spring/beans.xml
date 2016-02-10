@@ -33,4 +33,12 @@
 		<value>en_EN</value>
 	    <value>pl_PL</value>
 	</util:list>
+	
+	<bean id="noteMapper" class="org.dozer.DozerBeanMapper">
+	<property name="mappingFiles">
+		<list>
+			<value>noteMapping.xml</value>
+		</list>
+	</property>
+</bean>
 </beans>

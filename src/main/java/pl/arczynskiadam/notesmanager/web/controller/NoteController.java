@@ -103,38 +103,31 @@ public class NoteController extends AbstractController {
 		binder.addValidators(dateFilterValidator);
 	}
 	
-	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {SORT_COLUMN_PARAM, ASCENDING_PARAM})
-	public String updateSortColumn(@RequestParam(value = SORT_COLUMN_PARAM, required = true) String sortColumn,
-			@RequestParam(value = ASCENDING_PARAM, required = true) boolean ascending,
+//	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {
+//			"!"+CLEAR_DATE_FILTER_PARAM, "!"+DATE_FILTER_FROM, "!"+DATE_FILTER_TO,
+//			"!"+PAGE_NUMBER_PARAM, "!"+PAGE_SIZE_PARAM, "!"+SORT_COLUMN_PARAM, "!"+ASCENDING_PARAM,})
+//	public String listNotes(HttpServletRequest request,	final Model model) {
+//		
+//		NotesPaginationData paginationData = noteFacade.prepareNotesPaginationData();
+//		model.addAttribute(NoteControllerConstants.ModelAttrKeys.View.PAGINATION, paginationData);
+//		
+//		preparePage(paginationData, model);
+//		populateModelWithEntriesPerPage(model);
+//		displayInfoIfNoNotesFound(model, paginationData);
+//		
+//		return NoteControllerConstants.Pages.NOTES_LISTING_PAGE;
+//	}
+	
+	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET)
+	public String listNotes(
+			@RequestParam(PAGE_NUMBER_PARAM) int pageNumber,
+			@RequestParam(PAGE_SIZE_PARAM) int pageSize,
+			@RequestParam(SORT_COLUMN_PARAM) String sortCol,
+			@RequestParam(ASCENDING_PARAM) boolean sortAsc,
 			HttpServletRequest request,	final Model model) {
 		
-		noteFacade.updateSort(sortColumn, ascending);
-		return listNotes(request, model);
-	}
-	
-	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {PAGE_NUMBER_PARAM})
-	public String updatePageNumber(@RequestParam(value = PAGE_NUMBER_PARAM, required = true) int pageNumber,
-			HttpServletRequest request,	final Model model) {
-		
-		noteFacade.updatePageNumber(pageNumber);
-		return listNotes(request, model);
-	}
-	
-	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {PAGE_SIZE_PARAM})
-	public String updatePageSize(@RequestParam(value = PAGE_SIZE_PARAM, required = true) int pageSize,
-			HttpServletRequest request,	final Model model) {
-		
-		noteFacade.updatePageSize(pageSize);
-		return listNotes(request, model);
-	}
-	
-	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {
-			"!"+CLEAR_DATE_FILTER_PARAM, "!"+DATE_FILTER_FROM, "!"+DATE_FILTER_TO,
-			"!"+PAGE_NUMBER_PARAM, "!"+PAGE_SIZE_PARAM, "!"+SORT_COLUMN_PARAM, "!"+ASCENDING_PARAM,})
-	public String listNotes(HttpServletRequest request,	final Model model) {
-		
-		NotesPaginationData paginationData = noteFacade.prepareNotesPaginationData();
-		model.addAttribute(NoteControllerConstants.ModelAttrKeys.View.PAGINATION, paginationData);
+		NotesPaginationData paginationData = noteFacade.listNotes(pageNumber, pageSize, sortCol, sortAsc);
+		model.addAttribute(PAGINATION, paginationData);
 		
 		preparePage(paginationData, model);
 		populateModelWithEntriesPerPage(model);
@@ -154,207 +147,205 @@ public class NoteController extends AbstractController {
 		dateFilterForm.setFrom(paginationData.getDeadlineFilter().getFrom());
 		dateFilterForm.setTo(paginationData.getDeadlineFilter().getTo());
 		model.addAttribute(DATE_FILTER_FORM, dateFilterForm);
-		
-		populateModelWithEntriesPerPage(model);
 	}
 	
-	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {DATE_FILTER_FROM, DATE_FILTER_TO})
-	public String listNotesByDate(@ModelAttribute(SELECTED_CHECKBOXES_FORM) SelectedCheckboxesForm selectedCheckboxesForm,
-			@Valid @ModelAttribute(DATE_FILTER_FORM) DateFilterForm dateFilterForm,
-			BindingResult result,
-			HttpServletRequest request,
-			final Model model) {
-		
-		NotesPaginationData paginationData = null;
-			
-		if (result.hasErrors()) {
-			paginationData = noteFacade.prepareNotesPaginationData();
-			model.addAttribute(PAGINATION, paginationData);
-			
-			Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());
-			selectedCheckboxesForm.setSelections(selections);
-			
-			for (ObjectError e : result.getAllErrors()) {
-				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.switched")) {
-					GlobalMessages.addErrorMessage("DateFilter.dates.switched", model);
-				}
-				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.empty")) {
-					GlobalMessages.addErrorMessage("DateFilter.dates.empty", model);
-				}
-			}
-		} else {
-			DateFilterData dateFilter= new DateFilterData(dateFilterForm.getFrom(), dateFilterForm.getTo());
-			paginationData = noteFacade.updateDateFilter(dateFilter);
-		}
-				
-		model.addAttribute(PAGINATION, paginationData);
-		populateModelWithEntriesPerPage(model);
-		displayInfoIfNoNotesFound(model, paginationData);
-		
-		return NOTES_LISTING_PAGE;
-	}
+//	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {DATE_FILTER_FROM, DATE_FILTER_TO})
+//	public String listNotesByDate(@ModelAttribute(SELECTED_CHECKBOXES_FORM) SelectedCheckboxesForm selectedCheckboxesForm,
+//			@Valid @ModelAttribute(DATE_FILTER_FORM) DateFilterForm dateFilterForm,
+//			BindingResult result,
+//			HttpServletRequest request,
+//			final Model model) {
+//		
+//		NotesPaginationData paginationData = null;
+//			
+//		if (result.hasErrors()) {
+//			paginationData = noteFacade.prepareNotesPaginationData();
+//			model.addAttribute(PAGINATION, paginationData);
+//			
+//			Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());
+//			selectedCheckboxesForm.setSelections(selections);
+//			
+//			for (ObjectError e : result.getAllErrors()) {
+//				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.switched")) {
+//					GlobalMessages.addErrorMessage("DateFilter.dates.switched", model);
+//				}
+//				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.empty")) {
+//					GlobalMessages.addErrorMessage("DateFilter.dates.empty", model);
+//				}
+//			}
+//		} else {
+//			DateFilterData dateFilter= new DateFilterData(dateFilterForm.getFrom(), dateFilterForm.getTo());
+//			paginationData = noteFacade.updateDateFilter(dateFilter);
+//		}
+//				
+//		model.addAttribute(PAGINATION, paginationData);
+//		populateModelWithEntriesPerPage(model);
+//		displayInfoIfNoNotesFound(model, paginationData);
+//		
+//		return NOTES_LISTING_PAGE;
+//	}
 	
 	private void displayInfoIfNoNotesFound(final Model model, NotesPaginationData pagination) {
-		if(pagination.getPage().getNumberOfElements() == 0) {
+		if(pagination.getNotes().size() == 0) {
 			GlobalMessages.addWarningMessage("notes.listing.msg.noResults", model);
 		}
 	}
 	
-	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {CLEAR_DATE_FILTER_PARAM})
-	public String clearDateFilter(@RequestParam(CLEAR_DATE_FILTER_PARAM) String mode,
-			Model model, HttpServletRequest request) {
-		
-		noteFacade.clearDateFilter(mode);
-		noteFacade.updatePageNumber(DEFAULT_FIRST_PAGE);
-		
-		return listNotes(request, model);
-	}
-	
-	@RequestMapping(value = ADD_NOTE, method = RequestMethod.GET)
-	public String showNewNotePage(@ModelAttribute(NOTE_FORM) NoteForm note,
-			final Model model, final HttpServletRequest request) {
-		
-		createAddNotePageBreadcrumbs(model);
-		
-		return NoteControllerConstants.Pages.NEW_NOTE_PAGE;
-	}
-	
-	@RequestMapping(value = ADD_NOTE, method = RequestMethod.POST)
-	public String saveNewNote(@Validated(Default.class) @ModelAttribute(NOTE_FORM) NoteForm noteForm,
-			BindingResult bindinfgResult,
-			Model model,
-			RedirectAttributes attrs) {
-		
-		if (bindinfgResult.hasErrors()) {
-			createAddNotePageBreadcrumbs(model);
-			
-			GlobalMessages.addErrorMessage("global.error.correctAll", model);
-			
-			return NoteControllerConstants.Pages.NEW_NOTE_PAGE;
-		}
-		
-		noteFacade.addNewNote(noteForm);
-		GlobalMessages.addInfoFlashMessage("notes.addNew.msg.confirmation", attrs);
-		
-		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
-	}
-
-	@RequestMapping(value = EDIT_NOTE, method = RequestMethod.GET)
-	public String showEditNotePage(@PathVariable("noteId") Integer noteId, @ModelAttribute(NOTE_FORM) NoteForm noteForm,
-			Model model, RedirectAttributes attrs)
-	{
-		if (!noteFacade.hasCurrentUserRightsToNote(noteId)) {
-			GlobalMessages.addErrorFlashMessage("global.error.permission" , attrs);
-			return REDIRECT_PREFIX + SHOW_NOTES_FULL;
-		}
-		
-		createEditNotePageBreadcrumbs(model);
-		prepopulateNoteForm(noteId, noteForm);
-		
-		return EDIT_NOTE_PAGE;
-	}
-	
-	private void prepopulateNoteForm(Integer noteId, NoteForm noteForm) {
-		NoteModel note = noteFacade.findNoteById(noteId);
-		noteForm.setId(noteId);
-		noteForm.setAuthor(note.getAuthor().getNick());
-		noteForm.setTitle(note.getTitle());
-		noteForm.setContent(note.getContent());
-		noteForm.setDeadline(LocalDate.from(note.getDeadline()));
-		noteForm.setLatitude(note.getLatitude());
-		noteForm.setLongitude(note.getLongitude());
-	}
-	
-	@RequestMapping(value = EDIT_NOTE, method = RequestMethod.POST)
-	public String updateNote(@ModelAttribute(NOTE_FORM) @Valid NoteForm noteForm,
-			BindingResult bindinfgResult, Model model, RedirectAttributes attrs)
-	{
-		if (bindinfgResult.hasErrors()) {
-			createEditNotePageBreadcrumbs(model);
-			
-			GlobalMessages.addErrorMessage("global.error.correctAll", model);
-			
-			return NoteControllerConstants.Pages.EDIT_NOTE_PAGE;
-		}
-		
-		noteFacade.editNote(noteForm);
-		GlobalMessages.addInfoFlashMessage("notes.edit.msg.confirmation", attrs);
-		
-		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
-	}
-
-	@RequestMapping(value = DELETE_NOTE, method = RequestMethod.GET)
-	public String deleteNote(@PathVariable("noteId") Integer noteId, RedirectAttributes attrs) {
-	
-		if (!noteFacade.hasCurrentUserRightsToNote(noteId)) {
-			GlobalMessages.addErrorFlashMessage("global.error.permission" , attrs);
-			return REDIRECT_PREFIX + SHOW_NOTES_FULL;
-		}
-		
-		noteFacade.deleteNote(noteId);
-		GlobalMessages.addInfoFlashMessage("notes.delete.single.msg.confirmation" , attrs);
-		
-		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
-	}
-	
-	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.POST, params = {DELETE_PARAM})
-	public String deleteNotes(@RequestParam(value = GlobalControllerConstants.RequestParams.DELETE_PARAM) String delete,
-			@ModelAttribute(DATE_FILTER_FORM) DateFilterForm dateFilterForm,
-			@Valid @ModelAttribute(SELECTED_CHECKBOXES_FORM) SelectedCheckboxesForm selectedCheckboxesForm,	
-			BindingResult result,
-			Model model,
-			RedirectAttributes attrs) {
-		
-		String deletedNotesCount = null;
-		
-		if ("all".equals(delete)) {
-			deletedNotesCount = Integer.toString(noteFacade.getNotesCountForRegisteredUser(userFacade.getCurrentUser().getNick())); 
-			noteFacade.deleteAllNotesForCurrentUser();
-		} else if ("selected".equals(delete)) {
-			if (result.hasErrors()) {
-				NotesPaginationData pagination = noteFacade.prepareNotesPaginationData();
-				model.addAttribute(PAGINATION, pagination);
-				dateFilterForm.setFrom(pagination.getDeadlineFilter().getFrom());
-				dateFilterForm.setTo(pagination.getDeadlineFilter().getTo());
-				GlobalMessages.addErrorMessage("notes.delete.msg.nothingSelected", model);
-				populateModelWithEntriesPerPage(model);
-				return NOTES_LISTING_PAGE;
-			}
-			deletedNotesCount = Integer.toString(selectedCheckboxesForm.getSelections().size());
-			
-			Set<Integer> ids = Utils.mapStringSetToIntSet(selectedCheckboxesForm.getSelections());
-			noteFacade.deleteNotes(ids);
-		}
-		
-		GlobalMessages.addInfoFlashMessage("notes.delete.msg.confirmation", Collections.singletonList(deletedNotesCount), attrs);
-		
-		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
-	}
-	
-	@RequestMapping(value = NoteControllerConstants.URLs.NOTE_DETAILS, method = RequestMethod.GET)
-	public String noteDetails(@PathVariable("noteId") Integer noteId, final Model model, RedirectAttributes attrs) {
-		
-		if (userFacade.isCurrentUserAnonymous() && !noteFacade.isNoteCreatedByAnonymousAuthor(noteId)) {
-			GlobalMessages.addErrorFlashMessage("global.edit.note.error" , attrs);
-			return REDIRECT_PREFIX + SHOW_NOTES_FULL;
-		}
-		
-		createViewNotePageBreadcrumbs(model);
-		
-		model.addAttribute(NOTE, noteFacade.findNoteById(noteId));
-		
-		return NOTE_DETAILS_PAGE;
-	}
-	
-	@ResponseStatus(HttpStatus.OK)
-	@RequestMapping(value = "/updateSelections.json", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void noteSelected(@RequestBody SelectedCheckboxesForm selectedCheckboxesForm) {
-		log.debug("checboxes vals to update from ajax: " + selectedCheckboxesForm.toString());
-		
-		NotesPaginationData sessionPagesData = noteFacade.prepareNotesPaginationData();
-		Set<Integer> ids = Utils.mapStringSetToIntSet(selectedCheckboxesForm.getSelections());
-		sessionPagesData.setSelectedNotesIds(ids);
-	}
+//	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {CLEAR_DATE_FILTER_PARAM})
+//	public String clearDateFilter(@RequestParam(CLEAR_DATE_FILTER_PARAM) String mode,
+//			Model model, HttpServletRequest request) {
+//		
+//		noteFacade.clearDateFilter(mode);
+//		noteFacade.updatePageNumber(DEFAULT_FIRST_PAGE);
+//		
+//		return listNotes(request, model);
+//	}
+//	
+//	@RequestMapping(value = ADD_NOTE, method = RequestMethod.GET)
+//	public String showNewNotePage(@ModelAttribute(NOTE_FORM) NoteForm note,
+//			final Model model, final HttpServletRequest request) {
+//		
+//		createAddNotePageBreadcrumbs(model);
+//		
+//		return NoteControllerConstants.Pages.NEW_NOTE_PAGE;
+//	}
+//	
+//	@RequestMapping(value = ADD_NOTE, method = RequestMethod.POST)
+//	public String saveNewNote(@Validated(Default.class) @ModelAttribute(NOTE_FORM) NoteForm noteForm,
+//			BindingResult bindinfgResult,
+//			Model model,
+//			RedirectAttributes attrs) {
+//		
+//		if (bindinfgResult.hasErrors()) {
+//			createAddNotePageBreadcrumbs(model);
+//			
+//			GlobalMessages.addErrorMessage("global.error.correctAll", model);
+//			
+//			return NoteControllerConstants.Pages.NEW_NOTE_PAGE;
+//		}
+//		
+//		noteFacade.addNewNote(noteForm);
+//		GlobalMessages.addInfoFlashMessage("notes.addNew.msg.confirmation", attrs);
+//		
+//		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
+//	}
+//
+//	@RequestMapping(value = EDIT_NOTE, method = RequestMethod.GET)
+//	public String showEditNotePage(@PathVariable("noteId") Integer noteId, @ModelAttribute(NOTE_FORM) NoteForm noteForm,
+//			Model model, RedirectAttributes attrs)
+//	{
+//		if (!noteFacade.hasCurrentUserRightsToNote(noteId)) {
+//			GlobalMessages.addErrorFlashMessage("global.error.permission" , attrs);
+//			return REDIRECT_PREFIX + SHOW_NOTES_FULL;
+//		}
+//		
+//		createEditNotePageBreadcrumbs(model);
+//		prepopulateNoteForm(noteId, noteForm);
+//		
+//		return EDIT_NOTE_PAGE;
+//	}
+//	
+//	private void prepopulateNoteForm(Integer noteId, NoteForm noteForm) {
+//		NoteModel note = noteFacade.findNoteById(noteId);
+//		noteForm.setId(noteId);
+//		noteForm.setAuthor(note.getAuthor().getNick());
+//		noteForm.setTitle(note.getTitle());
+//		noteForm.setContent(note.getContent());
+//		noteForm.setDeadline(LocalDate.from(note.getDeadline()));
+//		noteForm.setLatitude(note.getLatitude());
+//		noteForm.setLongitude(note.getLongitude());
+//	}
+//	
+//	@RequestMapping(value = EDIT_NOTE, method = RequestMethod.POST)
+//	public String updateNote(@ModelAttribute(NOTE_FORM) @Valid NoteForm noteForm,
+//			BindingResult bindinfgResult, Model model, RedirectAttributes attrs)
+//	{
+//		if (bindinfgResult.hasErrors()) {
+//			createEditNotePageBreadcrumbs(model);
+//			
+//			GlobalMessages.addErrorMessage("global.error.correctAll", model);
+//			
+//			return NoteControllerConstants.Pages.EDIT_NOTE_PAGE;
+//		}
+//		
+//		noteFacade.editNote(noteForm);
+//		GlobalMessages.addInfoFlashMessage("notes.edit.msg.confirmation", attrs);
+//		
+//		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
+//	}
+//
+//	@RequestMapping(value = DELETE_NOTE, method = RequestMethod.GET)
+//	public String deleteNote(@PathVariable("noteId") Integer noteId, RedirectAttributes attrs) {
+//	
+//		if (!noteFacade.hasCurrentUserRightsToNote(noteId)) {
+//			GlobalMessages.addErrorFlashMessage("global.error.permission" , attrs);
+//			return REDIRECT_PREFIX + SHOW_NOTES_FULL;
+//		}
+//		
+//		noteFacade.deleteNote(noteId);
+//		GlobalMessages.addInfoFlashMessage("notes.delete.single.msg.confirmation" , attrs);
+//		
+//		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
+//	}
+//	
+//	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.POST, params = {DELETE_PARAM})
+//	public String deleteNotes(@RequestParam(value = GlobalControllerConstants.RequestParams.DELETE_PARAM) String delete,
+//			@ModelAttribute(DATE_FILTER_FORM) DateFilterForm dateFilterForm,
+//			@Valid @ModelAttribute(SELECTED_CHECKBOXES_FORM) SelectedCheckboxesForm selectedCheckboxesForm,	
+//			BindingResult result,
+//			Model model,
+//			RedirectAttributes attrs) {
+//		
+//		String deletedNotesCount = null;
+//		
+//		if ("all".equals(delete)) {
+//			deletedNotesCount = Integer.toString(noteFacade.getNotesCountForRegisteredUser(userFacade.getCurrentUser().getNick())); 
+//			noteFacade.deleteAllNotesForCurrentUser();
+//		} else if ("selected".equals(delete)) {
+//			if (result.hasErrors()) {
+//				NotesPaginationData pagination = noteFacade.prepareNotesPaginationData();
+//				model.addAttribute(PAGINATION, pagination);
+//				dateFilterForm.setFrom(pagination.getDeadlineFilter().getFrom());
+//				dateFilterForm.setTo(pagination.getDeadlineFilter().getTo());
+//				GlobalMessages.addErrorMessage("notes.delete.msg.nothingSelected", model);
+//				populateModelWithEntriesPerPage(model);
+//				return NOTES_LISTING_PAGE;
+//			}
+//			deletedNotesCount = Integer.toString(selectedCheckboxesForm.getSelections().size());
+//			
+//			Set<Integer> ids = Utils.mapStringSetToIntSet(selectedCheckboxesForm.getSelections());
+//			noteFacade.deleteNotes(ids);
+//		}
+//		
+//		GlobalMessages.addInfoFlashMessage("notes.delete.msg.confirmation", Collections.singletonList(deletedNotesCount), attrs);
+//		
+//		return REDIRECT_PREFIX + SHOW_NOTES_FULL;
+//	}
+//	
+//	@RequestMapping(value = NoteControllerConstants.URLs.NOTE_DETAILS, method = RequestMethod.GET)
+//	public String noteDetails(@PathVariable("noteId") Integer noteId, final Model model, RedirectAttributes attrs) {
+//		
+//		if (userFacade.isCurrentUserAnonymous() && !noteFacade.isNoteCreatedByAnonymousAuthor(noteId)) {
+//			GlobalMessages.addErrorFlashMessage("global.edit.note.error" , attrs);
+//			return REDIRECT_PREFIX + SHOW_NOTES_FULL;
+//		}
+//		
+//		createViewNotePageBreadcrumbs(model);
+//		
+//		model.addAttribute(NOTE, noteFacade.findNoteById(noteId));
+//		
+//		return NOTE_DETAILS_PAGE;
+//	}
+//	
+//	@ResponseStatus(HttpStatus.OK)
+//	@RequestMapping(value = "/updateSelections.json", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+//	public void noteSelected(@RequestBody SelectedCheckboxesForm selectedCheckboxesForm) {
+//		log.debug("checboxes vals to update from ajax: " + selectedCheckboxesForm.toString());
+//		
+//		NotesPaginationData sessionPagesData = noteFacade.prepareNotesPaginationData();
+//		Set<Integer> ids = Utils.mapStringSetToIntSet(selectedCheckboxesForm.getSelections());
+//		sessionPagesData.setSelectedNotesIds(ids);
+//	}
 	
 	private void populateModelWithEntriesPerPage(Model model) {
 		model.addAttribute(NoteControllerConstants.ModelAttrKeys.View.PAGE_SIZES, notesPageSizes);

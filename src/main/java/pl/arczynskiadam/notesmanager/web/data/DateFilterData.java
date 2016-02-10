@@ -16,19 +16,15 @@ public class DateFilterData {
 	public boolean isActive() {
 		return !(from == null && to == null);
 	}
-
 	public LocalDate getFrom() {
 		return from;
 	}
-
 	public void setFrom(LocalDate from) {
 		this.from = from;
 	}
-
 	public LocalDate getTo() {
 		return to;
 	}
-
 	public void setTo(LocalDate to) {
 		this.to = to;
 	}

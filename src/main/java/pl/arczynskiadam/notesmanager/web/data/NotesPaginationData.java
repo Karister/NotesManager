@@ -2,75 +2,52 @@ package pl.arczynskiadam.notesmanager.web.data;
 
 import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.DEFAULT_MAX_LINKED_PAGES;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
-import org.springframework.data.domain.Page;
-
-import pl.arczynskiadam.notesmanager.core.model.NoteModel;
 
 public class NotesPaginationData {
 	{
-		selectedNotesIds = new HashSet<Integer>();
-		maxLinkedPages = 10;
-		deadlineFilter = new DateFilterData();
+		maxLinkedPages = DEFAULT_MAX_LINKED_PAGES;
 	}
 	
-	private Page<NoteModel> page;
 	private Set<Integer> selectedNotesIds;
 	private DateFilterData deadlineFilter;
 	private int maxLinkedPages;
-	
-	public NotesPaginationData() {
-		this(DEFAULT_MAX_LINKED_PAGES);
-	}
-	public NotesPaginationData(int maxLinkedPages) {
-		this.maxLinkedPages = maxLinkedPages;
-	}
-	
-	public String getSortCol() {
-		return page.getSort().iterator().next().getProperty();
-	}
-	
-	public boolean isSortAscending() {
-		return page.getSort().getOrderFor(getSortCol()).isAscending();
-	}
+	private int currentPage;
+	private int pageSize;
+	private int totalPages;
+	private List<NoteData> notes;
+	private String sortColumn;
+	private boolean sortAscending;
 	
 	public int getFirstLinkedPage()
 	{
-		if (maxLinkedPages > page.getTotalPages()) {
+		if (maxLinkedPages > totalPages) {
 			return 0;
 		}
-		int begin = page.getNumber() - maxLinkedPages / 2;
-		int offset = Math.max(0, (page.getNumber() + maxLinkedPages / 2) - (page.getTotalPages() - 1));
+		int begin = currentPage - maxLinkedPages / 2;
+		int offset = Math.max(0, (currentPage + maxLinkedPages / 2) - (totalPages - 1));
 		int firstLinkedPage = begin - offset;
 		return Math.max(0, firstLinkedPage);
 	}
 
 	public int getLastLinkedPage()
 	{
-		if (maxLinkedPages > page.getTotalPages()) {
-			return page.getTotalPages() - 1;
+		if (maxLinkedPages > totalPages) {
+			return totalPages - 1;
 		}
-		int end = page.getNumber() + maxLinkedPages / 2;
-		int offset = Math.max(0, -(page.getNumber() - maxLinkedPages / 2));
+		int end = currentPage + maxLinkedPages / 2;
+		int offset = Math.max(0, - (currentPage - maxLinkedPages / 2));
 		int lastLinkedPage = end + offset;
-		return Math.min(page.getTotalPages() - 1, lastLinkedPage);
+		return Math.min(currentPage - 1, lastLinkedPage);
 	}
-	
-	public Page<NoteModel> getPage() {
-		return page;
-	}
-	public void setPage(Page<NoteModel> page) {
-		this.page = page;
-	}
+
 	public Set<Integer> getSelectedNotesIds() {
 		return selectedNotesIds;
 	}
 	public void setSelectedNotesIds(Set<Integer> selectedNotesIds) {
 		this.selectedNotesIds = selectedNotesIds;
 	}
-	
 	public DateFilterData getDeadlineFilter() {
 		return deadlineFilter;
 	}
@@ -80,7 +57,43 @@ public class NotesPaginationData {
 	public int getMaxLinkedPages() {
 		return maxLinkedPages;
 	}
-	public void setMaxLinkedPages(int linkedPages) {
-		this.maxLinkedPages = linkedPages;
+	public void setMaxLinkedPages(int maxLinkedPages) {
+		this.maxLinkedPages = maxLinkedPages;
+	}
+	public int getCurrentPage() {
+		return currentPage;
+	}
+	public void setCurrentPage(int currentPage) {
+		this.currentPage = currentPage;
+	}
+	public List<NoteData> getNotes() {
+		return notes;
+	}
+	public void setNotes(List<NoteData> notes) {
+		this.notes = notes;
+	}
+	public String getSortColumn() {
+		return sortColumn;
+	}
+	public void setSortColumn(String sortColumn) {
+		this.sortColumn = sortColumn;
+	}
+	public boolean isSortAscending() {
+		return sortAscending;
+	}
+	public void setSortAscending(boolean sortAscending) {
+		this.sortAscending = sortAscending;
+	}
+	public int getTotalPages() {
+		return totalPages;
+	}
+	public void setTotalPages(int totalPages) {
+		this.totalPages = totalPages;
+	}
+	public int getPageSize() {
+		return pageSize;
+	}
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
 	}
 }

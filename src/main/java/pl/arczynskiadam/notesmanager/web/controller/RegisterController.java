@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants;
-import pl.arczynskiadam.notesmanager.web.controller.constants.LoginControllerConstants;
 import pl.arczynskiadam.notesmanager.web.controller.constants.RegisterControllerConstants;
-import pl.arczynskiadam.notesmanager.web.facade.NoteFacade;
 import pl.arczynskiadam.notesmanager.web.facade.UserFacade;
 import pl.arczynskiadam.notesmanager.web.form.RegisterForm;
 import pl.arczynskiadam.notesmanager.web.messages.GlobalMessages;
@@ -38,9 +35,6 @@ public class RegisterController extends AbstractController {
 
 	@Resource
 	private UserFacade userFacade;
-	
-	@Resource
-	private NoteFacade noteFacade;
 	
 	@Resource(name = "authenticationManager")
 	private AuthenticationManager authMgr;
@@ -93,7 +87,6 @@ public class RegisterController extends AbstractController {
 
 			if (auth.isAuthenticated()) {
 				SecurityContextHolder.getContext().setAuthentication(auth);
-				noteFacade.removePaginationDataFromSession();
 				GlobalMessages.addInfoFlashMessage("global.login.auto", attrs);
 			}
 		} catch (Exception e) {

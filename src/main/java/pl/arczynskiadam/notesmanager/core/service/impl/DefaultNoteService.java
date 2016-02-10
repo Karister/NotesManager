@@ -38,9 +38,6 @@ public class DefaultNoteService implements NoteService {
 	private NoteRepository noteDAO;
 	
 	@Autowired(required = true)
-	private SessionService sessionService;
-	
-	@Autowired(required = true)
 	private UserService userService;
 	
 	@Override
@@ -178,45 +175,13 @@ public class DefaultNoteService implements NoteService {
 		return note;
 	}
 	
+	private Pageable constructPageSpecification(int pageIndex, int pageSize, String sortCol, boolean asc) {
+		Sort sort = new Sort(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortCol);
+		Pageable pageSpecification = new PageRequest(pageIndex, pageSize, sort);
+		return pageSpecification;
+	}
+	
 	public void setNoteDAO(NoteRepository noteDAO) {
 		this.noteDAO = noteDAO;
 	}
-	
-	@Override
-	public void clearFromDateFilter(String mode) {
-		NotesPaginationData sessionPaginationData = retrievePagesDataFromSession();
-		if (sessionPaginationData != null) {
-			switch (mode) {
-				case "from":
-					sessionPaginationData.getDeadlineFilter().setFrom(null);
-					break;
-				case "to":
-					sessionPaginationData.getDeadlineFilter().setTo(null);
-					break;
-				case "both":
-					sessionPaginationData.setDeadlineFilter(new DateFilterData());					
-			}
-		}
-	}
-	
-	@Override
-	public NotesPaginationData retrievePagesDataFromSession() {
-		return (NotesPaginationData) sessionService.getCurrentSession().getAttribute(NOTES_PAGINATION);
-	}
-	
-	@Override
-	public boolean isSessionPaginationDataAvailable() {
-		return retrievePagesDataFromSession() != null;
-	}
-	
-	@Override
-	public void savePagesDataToSession(NotesPaginationData pagesData) {
-		sessionService.getCurrentSession().setAttribute(NOTES_PAGINATION, pagesData);
-	}
-	
-	private Pageable constructPageSpecification(int pageIndex, int pageSize, String sortCol, boolean asc) {
-		Sort sort = new Sort(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortCol);
-        Pageable pageSpecification = new PageRequest(pageIndex, pageSize, sort);
-        return pageSpecification;
-    }
 }
