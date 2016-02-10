@@ -2,70 +2,44 @@ package pl.arczynskiadam.notesmanager.web.controller;
 
 import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.Misc.HASH;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.ModelAttrKeys.Form.SELECTED_CHECKBOXES_FORM;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.Prefixes.REDIRECT_PREFIX;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.ASCENDING_PARAM;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.CLEAR_DATE_FILTER_PARAM;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.DATE_FILTER_FROM;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.DATE_FILTER_TO;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.DELETE_PARAM;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.PAGE_NUMBER_PARAM;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.PAGE_SIZE_PARAM;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.SORT_COLUMN_PARAM;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.ModelAttrKeys.Form.DATE_FILTER_FORM;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.ModelAttrKeys.Form.NOTE_FORM;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.ModelAttrKeys.View.NOTE;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.ModelAttrKeys.View.PAGINATION;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.Pages.EDIT_NOTE_PAGE;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.Pages.NOTES_LISTING_PAGE;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.Pages.NOTE_DETAILS_PAGE;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.URLs.ADD_NOTE;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.URLs.DELETE_NOTE;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.URLs.EDIT_NOTE;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.URLs.SHOW_NOTES;
 import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.URLs.SHOW_NOTES_FULL;
+import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.ANONYMOUS_USER_DEFAULT_SORT_COLUMN;
+import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.DEFAULT_ENTRIES_PER_PAGE;
 import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.DEFAULT_FIRST_PAGE;
+import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.REGISTERED_USER_DEFAULT_SORT_COLUMN;
 
-import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.groups.Default;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import pl.arczynskiadam.notesmanager.core.model.NoteModel;
 import pl.arczynskiadam.notesmanager.utils.collections.Utils;
 import pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants;
 import pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants;
-import pl.arczynskiadam.notesmanager.web.data.DateFilterData;
 import pl.arczynskiadam.notesmanager.web.data.NotesPaginationData;
 import pl.arczynskiadam.notesmanager.web.facade.NoteFacade;
 import pl.arczynskiadam.notesmanager.web.facade.UserFacade;
 import pl.arczynskiadam.notesmanager.web.form.DateFilterForm;
-import pl.arczynskiadam.notesmanager.web.form.NoteForm;
 import pl.arczynskiadam.notesmanager.web.form.SelectedCheckboxesForm;
 import pl.arczynskiadam.notesmanager.web.form.validation.DateFilterValidator;
 import pl.arczynskiadam.notesmanager.web.form.validation.SelectedCheckboxesValidator;
@@ -120,13 +94,18 @@ public class NoteController extends AbstractController {
 	
 	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET)
 	public String listNotes(
-			@RequestParam(PAGE_NUMBER_PARAM) int pageNumber,
-			@RequestParam(PAGE_SIZE_PARAM) int pageSize,
-			@RequestParam(SORT_COLUMN_PARAM) String sortCol,
-			@RequestParam(ASCENDING_PARAM) boolean sortAsc,
+			@RequestParam(PAGE_NUMBER_PARAM) Optional<Integer> pageNumber,
+			@RequestParam(PAGE_SIZE_PARAM) Optional<Integer> pageSize,
+			@RequestParam(SORT_COLUMN_PARAM) Optional<String> sortCol,
+			@RequestParam(ASCENDING_PARAM) Optional<Boolean> sortAsc,
 			HttpServletRequest request,	final Model model) {
 		
-		NotesPaginationData paginationData = noteFacade.listNotes(pageNumber, pageSize, sortCol, sortAsc);
+		NotesPaginationData paginationData = noteFacade.listNotes(
+				pageNumber.map(Function.identity()).orElse(DEFAULT_FIRST_PAGE),
+				pageSize.map(Function.identity()).orElse(DEFAULT_ENTRIES_PER_PAGE),
+				sortCol.map(Function.identity()).orElse(resolveSortColumn()),
+				sortAsc.map(Function.identity()).orElse(Boolean.TRUE));
+		
 		model.addAttribute(PAGINATION, paginationData);
 		
 		preparePage(paginationData, model);
@@ -136,6 +115,10 @@ public class NoteController extends AbstractController {
 		return NoteControllerConstants.Pages.NOTES_LISTING_PAGE;
 	}
 
+	private String resolveSortColumn() {
+		return userFacade.isCurrentUserAnonymous() ? ANONYMOUS_USER_DEFAULT_SORT_COLUMN : REGISTERED_USER_DEFAULT_SORT_COLUMN;
+	}
+	
 	private void preparePage(NotesPaginationData paginationData, Model model)
 	{
 		Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());

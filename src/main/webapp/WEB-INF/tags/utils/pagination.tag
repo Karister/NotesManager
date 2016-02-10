@@ -12,9 +12,9 @@
 	<div class="margin"></div>
 	<div class="center">
 		<div class="paginationHolder">
-			<c:if test="${!paginationData.page.firstPage}">
+			<c:if test="${!paginationData.firstPage}">
 				<c:url value="${linkCore}" var="pagedLink">
-					<c:param name="p" value="${paginationData.page.number - 1}"/>
+					<c:param name="p" value="${paginationData.currentPage - 1}"/>
 				</c:url>
 				<a href="${pagedLink}">
 					<span class="pagingItem">&lt;</span>
@@ -33,7 +33,7 @@
 			</c:if>
 			<c:forEach begin="${paginationData.firstLinkedPage}" end="${paginationData.lastLinkedPage}" var="i">
 				<c:choose>
-					<c:when test="${paginationData.page.number == i}">
+					<c:when test="${paginationData.currentPage == i}">
 						<span class="pagingItem active">${i + 1}</span>
 					</c:when>
 					<c:otherwise>
@@ -46,20 +46,20 @@
 					</c:otherwise>
 				</c:choose>
 			</c:forEach>
-			<c:if test="${paginationData.lastLinkedPage < paginationData.page.totalPages - 2}">
+			<c:if test="${paginationData.lastLinkedPage < paginationData.totalPages - 2}">
 				<span class="pagingDots">...</span>
 			</c:if>
-			<c:if test="${paginationData.lastLinkedPage < paginationData.page.totalPages - 1}">
+			<c:if test="${paginationData.lastLinkedPage < paginationData.totalPages - 1}">
 				<c:url value="${linkCore}" var="pagedLink">
-					<c:param name="p" value="${paginationData.page.totalPages - 1}"/>
+					<c:param name="p" value="${paginationData.totalPages - 1}"/>
 				</c:url>
 				<a href="${pagedLink}">
-					<span class="pagingItem">${paginationData.page.totalPages}</span>
+					<span class="pagingItem">${paginationData.totalPages}</span>
 				</a>
 			</c:if>
-			<c:if test="${!paginationData.page.lastPage}">
+			<c:if test="${!paginationData.lastPage}">
 				<c:url value="${linkCore}" var="pagedLink">
-					<c:param name="p" value="${paginationData.page.number + 1}"/>
+					<c:param name="p" value="${paginationData.currentPage + 1}"/>
 				</c:url>
 				<a href="${pagedLink}">
 					<span class="pagingItem">&gt;</span>
@@ -74,7 +74,7 @@
 		<c:url value="/notesmanager/show" var="action" />
 		<select class="notesPageSize" data-action="${action}">
 			<c:forEach items="${notesPageSizes}" var="size">
-				<option value="${size}"${size eq paginationData.page.size?'selected="selected"':''}>${size}</option>
+				<option value="${size}"${size eq paginationData.pageSize?'selected="selected"':''}>${size}</option>
 			</c:forEach>
 		</select>
 	</div>

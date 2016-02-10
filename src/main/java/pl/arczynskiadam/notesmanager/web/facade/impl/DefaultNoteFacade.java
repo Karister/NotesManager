@@ -79,6 +79,9 @@ public class DefaultNoteFacade implements NoteFacade {
 				
 		notesPaginationData.setNotes(notesPage.getContent().stream().map(e -> noteMapper.map(e, NoteData.class)).collect(toList()));
 		notesPaginationData.setTotalPages(notesPage.getTotalPages());
+		notesPaginationData.setTotalNotes(notesPage.getTotalElements());
+		notesPaginationData.setFirstPage(notesPage.isFirstPage());
+		notesPaginationData.setLastPage(notesPage.isLastPage());
 		
 		return notesPaginationData;
 	}

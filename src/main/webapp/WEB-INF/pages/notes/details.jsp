@@ -34,7 +34,7 @@
 						<spring:message code="notes.details.label.author" />:
 					</span>
 					<div class="indent50">
-						<c:out value="${note.author.nick}" />
+						<c:out value="${note.author}" />
 					</div>
 				</div>
 			</security:authorize>

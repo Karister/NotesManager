@@ -19,10 +19,10 @@
 <c:url var="ascActiveImgUrl" value="/themes/${ascActive}"/>
 <c:url var="descActiveImgUrl" value="/themes/${descActive}"/>
 
-<c:set var="sortCol" value="${notesPaginationData.sortCol}"/>
+<c:set var="sortCol" value="${notesPaginationData.sortColumn}"/>
 <c:set var="isSortAsc" value="${notesPaginationData.sortAscending}"/>
 
-<c:if test="${fn:length(notesPaginationData.page.content) gt 10}">
+<c:if test="${fn:length(notesPaginationData.notes) gt 10}">
 	<utils:pagination paginationData="${notesPaginationData}" linkCore="${linkCore}" />
 </c:if>
 <c:url value="/notesmanager/updateSelections.json" var="checkboxAjaxUrl" />
@@ -57,9 +57,9 @@
 				<th class="corner"/>
 				<security:authorize ifAnyGranted="ROLE_ANONYMOUS">
 					<th>
-						<navigation:sortHeader divClass="sort" sortColumn="author.nick" imgSize="16"
-								ascImgUrl="${sortCol eq 'author.nick' && isSortAsc ? ascActiveImgUrl : ascImgUrl}"
-								descImgUrl="${sortCol eq 'author.nick' && !isSortAsc ? descActiveImgUrl : descImgUrl}" >
+						<navigation:sortHeader divClass="sort" sortColumn="author" imgSize="16"
+								ascImgUrl="${sortCol eq 'author' && isSortAsc ? ascActiveImgUrl : ascImgUrl}"
+								descImgUrl="${sortCol eq 'author' && !isSortAsc ? descActiveImgUrl : descImgUrl}" >
 							<span><spring:message code="notes.listing.label.author"/></span>
 						</navigation:sortHeader>
 					</th>
@@ -89,7 +89,7 @@
 			</tr>
 		</thead>
 		<tbody>	
-			<c:forEach items="${notesPaginationData.page.content}" var="note" varStatus="loopStatus">
+			<c:forEach items="${notesPaginationData.notes}" var="note" varStatus="loopStatus">
 				<tr>
 					<security:authorize ifNotGranted="ROLE_ANONYMOUS">
 						<td class="left">
@@ -99,9 +99,9 @@
 							</div>
 						</td>
 					</security:authorize>
-					<td class="left"><spring:message text="${notesPaginationData.page.number * notesPaginationData.page.size + loopStatus.index + 1}."/></td>
+					<td class="left"><spring:message text="${notesPaginationData.currentPage * notesPaginationData.totalPages + loopStatus.index + 1}."/></td>
 					<security:authorize ifAnyGranted="ROLE_ANONYMOUS">
-						<td><c:out value="${note.author.nick}" /></td>
+						<td><c:out value="${note.author}" /></td>
 					</security:authorize>
 					<td><c:out value="${note.title}" /></td>
 					<td>

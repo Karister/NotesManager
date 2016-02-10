@@ -2,8 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-    					http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    					http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
    
 	<bean id="selectedNotesValidator" class="pl.arczynskiadam.notesmanager.web.form.validation.SelectedCheckboxesValidator">
 		<property name="errCode" value="NotesSelectionForm.ids.NoneSelected" />
@@ -37,7 +37,8 @@
 	<bean id="noteMapper" class="org.dozer.DozerBeanMapper">
 	<property name="mappingFiles">
 		<list>
-			<value>noteMapping.xml</value>
+			<value>dozer/noteMapping.xml</value>
+			<value>dozerJdk8Converters.xml</value>
 		</list>
 	</property>
 </bean>

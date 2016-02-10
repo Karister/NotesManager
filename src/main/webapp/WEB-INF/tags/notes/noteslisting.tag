@@ -8,11 +8,11 @@
 
 <c:set value="/notesmanager/show/" var="linkCore" />
 
-<c:if test="${fn:length(notesPaginationData.page.content) gt 0}">
+<c:if test="${fn:length(notesPaginationData.notes) gt 0}">
 	<notes:datefilter />
 	<notes:notesgrid />
 </c:if>
-<c:if test="${empty notesPaginationData.page.content}">
+<c:if test="${empty notesPaginationData.notes}">
 	<c:if test="${notesPaginationData.deadlineFilter.active}">
 		<notes:datefilter />	
 	</c:if>
@@ -23,7 +23,7 @@
 	</a>
 </c:if>
 
-<spring:message code="global.delete.all.popup.info" arguments="${notesPaginationData.page.totalElements}" var="askDeleteAll" />
+<spring:message code="global.delete.all.popup.info" arguments="${notesPaginationData.totalNotes}" var="askDeleteAll" />
 <div id="popupI18NData"
 	 data-askdeleteall="${askDeleteAll}"
 	 data-askheader='<spring:message code="global.areYouSure" />'
@@ -35,5 +35,5 @@
 	<spring:message code="global.delete.selected.popup.info" arguments="${fn:length(notesPaginationData.selectedNotesIds)}" />
 </div>
 <div id="dialog-deleteAll" title="<spring:message code="global.areYouSure" />">
-	<spring:message code="global.delete.all.popup.info" arguments="${notesPaginationData.page.totalElements}"/>
+	<spring:message code="global.delete.all.popup.info" arguments="${notesPaginationData.totalNotes}"/>
 </div>

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class NoteData {
+	private long id;
 	private String author;
 	private String title;
 	private String content;
@@ -13,6 +14,12 @@ public class NoteData {
 	private LocalDateTime dateCreated;
 	private LocalDateTime lastModified;
 	
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
 	public String getAuthor() {
 		return author;
 	}

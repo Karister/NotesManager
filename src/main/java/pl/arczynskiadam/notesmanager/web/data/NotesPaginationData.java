@@ -2,12 +2,15 @@ package pl.arczynskiadam.notesmanager.web.data;
 
 import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.DEFAULT_MAX_LINKED_PAGES;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class NotesPaginationData {
 	{
 		maxLinkedPages = DEFAULT_MAX_LINKED_PAGES;
+		selectedNotesIds = new HashSet<>();
+		deadlineFilter = new DateFilterData();
 	}
 	
 	private Set<Integer> selectedNotesIds;
@@ -16,9 +19,12 @@ public class NotesPaginationData {
 	private int currentPage;
 	private int pageSize;
 	private int totalPages;
+	private long totalNotes;
 	private List<NoteData> notes;
 	private String sortColumn;
 	private boolean sortAscending;
+	private boolean lastPage;
+	private boolean firstPage;
 	
 	public int getFirstLinkedPage()
 	{
@@ -95,5 +101,23 @@ public class NotesPaginationData {
 	}
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
+	}
+	public long getTotalNotes() {
+		return totalNotes;
+	}
+	public void setTotalNotes(long totalNotes) {
+		this.totalNotes = totalNotes;
+	}
+	public boolean isLastPage() {
+		return lastPage;
+	}
+	public void setLastPage(boolean lastPage) {
+		this.lastPage = lastPage;
+	}
+	public boolean isFirstPage() {
+		return firstPage;
+	}
+	public void setFirstPage(boolean firstPage) {
+		this.firstPage = firstPage;
 	}
 }
