@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
@@ -67,6 +68,7 @@ public class DefaultNoteFacade implements NoteFacade {
 	}
 	
 	@Override
+	@Transactional
 	public NotesPaginationData listNotes(int pageNumber, int pageSize, String sortCol, boolean sortAsc)
 	{
 		NotesPaginationData notesPaginationData = new NotesPaginationData();

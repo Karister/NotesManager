@@ -1,7 +1,5 @@
 package pl.arczynskiadam.notesmanager.core.service.impl;
 
-import static pl.arczynskiadam.notesmanager.core.service.constants.ServiceConstants.Session.Attributes.NOTES_PAGINATION;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -23,10 +21,8 @@ import pl.arczynskiadam.notesmanager.core.model.AnonymousUserModel;
 import pl.arczynskiadam.notesmanager.core.model.NoteModel;
 import pl.arczynskiadam.notesmanager.core.model.RegisteredUserModel;
 import pl.arczynskiadam.notesmanager.core.service.NoteService;
-import pl.arczynskiadam.notesmanager.core.service.SessionService;
 import pl.arczynskiadam.notesmanager.core.service.UserService;
 import pl.arczynskiadam.notesmanager.web.data.DateFilterData;
-import pl.arczynskiadam.notesmanager.web.data.NotesPaginationData;
 
 @Service
 public class DefaultNoteService implements NoteService {
@@ -94,12 +90,8 @@ public class DefaultNoteService implements NoteService {
 	}
 	
 	private Page<NoteModel> listNotesForAnonymousUser(int pageId, int pageSize, String sortCol, boolean asc) {
-		Page<NoteModel> notes = noteDAO.findAll(NoteSpecs.anonymous(),
+		return noteDAO.findAll(NoteSpecs.anonymous(),
 				constructPageSpecification(keepPageNumberInRange(pageId, pageSize), pageSize, sortCol, asc));
-		for (NoteModel note : notes.getContent()) {
-			note.getAuthor().getNick();
-		}
-		return notes;
 	}
 
 	private int keepPageNumberInRange(int pageId, int pageSize, RegisteredUserModel currentUser) {
@@ -137,13 +129,7 @@ public class DefaultNoteService implements NoteService {
 			spec = spec.and(NoteSpecs.to(dateFilter.getTo()));
 		}
 		
-		Page<NoteModel> notes = noteDAO.findAll(spec, constructPageSpecification(pageId, pageSize, sortCol, asc));
-		if (currentUser == null) {
-			for (NoteModel note : notes.getContent()) {
-				note.getAuthor().getNick();
-			}
-		}
-		return notes;
+		return noteDAO.findAll(spec, constructPageSpecification(pageId, pageSize, sortCol, asc));
 	}
 
 	@Override
@@ -168,11 +154,7 @@ public class DefaultNoteService implements NoteService {
 	@Override
 	@Transactional
 	public NoteModel findNoteById(int id) {
-		NoteModel note = noteDAO.findOne(id);
-		if (note != null) {
-			note.getAuthor().getNick();
-		}
-		return note;
+		return noteDAO.findOne(id);
 	}
 	
 	private Pageable constructPageSpecification(int pageIndex, int pageSize, String sortCol, boolean asc) {
