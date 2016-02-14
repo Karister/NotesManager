@@ -14,6 +14,8 @@ import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstant
 import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.DEFAULT_ENTRIES_PER_PAGE;
 import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.DEFAULT_FIRST_PAGE;
 import static pl.arczynskiadam.notesmanager.web.facade.constants.FacadesConstants.Defaults.Pagination.REGISTERED_USER_DEFAULT_SORT_COLUMN;
+import static pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants.Pages.*;
+import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,13 +24,18 @@ import java.util.function.Function;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import pl.arczynskiadam.notesmanager.utils.collections.Utils;
 import pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants;
 import pl.arczynskiadam.notesmanager.web.controller.constants.NoteControllerConstants;
+import pl.arczynskiadam.notesmanager.web.data.DateFilterData;
 import pl.arczynskiadam.notesmanager.web.data.NotesPaginationData;
 import pl.arczynskiadam.notesmanager.web.facade.NoteFacade;
 import pl.arczynskiadam.notesmanager.web.facade.UserFacade;
@@ -100,27 +108,65 @@ public class NoteController extends AbstractController {
 			@RequestParam(ASCENDING_PARAM) Optional<Boolean> sortAsc,
 			HttpServletRequest request,	final Model model) {
 		
+		NotesPaginationData paginationData = buildPaginationData(pageNumber, pageSize, sortCol, sortAsc);
+		preparePage(paginationData, model);
+		
+		return NOTES_LISTING_PAGE;
+	}
+
+	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {DATE_FILTER_FROM, DATE_FILTER_TO})
+	public String listNotesByDate(
+			@RequestParam(PAGE_NUMBER_PARAM) Optional<Integer> pageNumber,
+			@RequestParam(PAGE_SIZE_PARAM) Optional<Integer> pageSize,
+			@RequestParam(SORT_COLUMN_PARAM) Optional<String> sortCol,
+			@RequestParam(ASCENDING_PARAM) Optional<Boolean> sortAsc,
+			@ModelAttribute(SELECTED_CHECKBOXES_FORM) SelectedCheckboxesForm selectedCheckboxesForm,
+			@Valid @ModelAttribute(DATE_FILTER_FORM) DateFilterForm dateFilterForm,
+			BindingResult result,
+			HttpServletRequest request,
+			final Model model) {
+		
+		NotesPaginationData paginationData = buildPaginationData(pageNumber, pageSize, sortCol, sortAsc);
+			
+		if (result.hasErrors()) {
+			paginationData = buildPaginationData(pageNumber, pageSize, sortCol, sortAsc);
+			
+			Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());
+			selectedCheckboxesForm.setSelections(selections);
+			
+			for (ObjectError e : result.getAllErrors()) {
+				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.switched")) {
+					GlobalMessages.addErrorMessage("DateFilter.dates.switched", model);
+				}
+				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.empty")) {
+					GlobalMessages.addErrorMessage("DateFilter.dates.empty", model);
+				}
+			}
+		} 
+		
+		preparePage(paginationData, model);
+		
+		return NOTES_LISTING_PAGE;
+	}
+
+	private NotesPaginationData buildPaginationData(Optional<Integer> pageNumber, Optional<Integer> pageSize,
+			Optional<String> sortCol, Optional<Boolean> sortAsc) {
+		
 		NotesPaginationData paginationData = noteFacade.listNotes(
 				pageNumber.map(Function.identity()).orElse(DEFAULT_FIRST_PAGE),
 				pageSize.map(Function.identity()).orElse(DEFAULT_ENTRIES_PER_PAGE),
 				sortCol.map(Function.identity()).orElse(resolveSortColumn()),
 				sortAsc.map(Function.identity()).orElse(Boolean.TRUE));
 		
-		model.addAttribute(PAGINATION, paginationData);
-		
-		preparePage(paginationData, model);
-		populateModelWithEntriesPerPage(model);
-		displayInfoIfNoNotesFound(model, paginationData);
-		
-		return NoteControllerConstants.Pages.NOTES_LISTING_PAGE;
-	}
-
-	private String resolveSortColumn() {
-		return userFacade.isCurrentUserAnonymous() ? ANONYMOUS_USER_DEFAULT_SORT_COLUMN : REGISTERED_USER_DEFAULT_SORT_COLUMN;
+		return paginationData;
 	}
 	
 	private void preparePage(NotesPaginationData paginationData, Model model)
 	{
+		populateModelWithPageData(paginationData, model);
+		displayInfoIfNoNotesFound(model, paginationData);
+		populateModelWithEntriesPerPage(model);
+		
 		Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());
 		SelectedCheckboxesForm selectedCheckboxesForm = new SelectedCheckboxesForm();
 		selectedCheckboxesForm.setSelections(selections);
@@ -132,41 +178,9 @@ public class NoteController extends AbstractController {
 		model.addAttribute(DATE_FILTER_FORM, dateFilterForm);
 	}
 	
-//	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {DATE_FILTER_FROM, DATE_FILTER_TO})
-//	public String listNotesByDate(@ModelAttribute(SELECTED_CHECKBOXES_FORM) SelectedCheckboxesForm selectedCheckboxesForm,
-//			@Valid @ModelAttribute(DATE_FILTER_FORM) DateFilterForm dateFilterForm,
-//			BindingResult result,
-//			HttpServletRequest request,
-//			final Model model) {
-//		
-//		NotesPaginationData paginationData = null;
-//			
-//		if (result.hasErrors()) {
-//			paginationData = noteFacade.prepareNotesPaginationData();
-//			model.addAttribute(PAGINATION, paginationData);
-//			
-//			Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());
-//			selectedCheckboxesForm.setSelections(selections);
-//			
-//			for (ObjectError e : result.getAllErrors()) {
-//				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.switched")) {
-//					GlobalMessages.addErrorMessage("DateFilter.dates.switched", model);
-//				}
-//				if (ArrayUtils.contains(e.getCodes(), "DateFilter.dates.empty")) {
-//					GlobalMessages.addErrorMessage("DateFilter.dates.empty", model);
-//				}
-//			}
-//		} else {
-//			DateFilterData dateFilter= new DateFilterData(dateFilterForm.getFrom(), dateFilterForm.getTo());
-//			paginationData = noteFacade.updateDateFilter(dateFilter);
-//		}
-//				
-//		model.addAttribute(PAGINATION, paginationData);
-//		populateModelWithEntriesPerPage(model);
-//		displayInfoIfNoNotesFound(model, paginationData);
-//		
-//		return NOTES_LISTING_PAGE;
-//	}
+	private String resolveSortColumn() {
+		return userFacade.isCurrentUserAnonymous() ? ANONYMOUS_USER_DEFAULT_SORT_COLUMN : REGISTERED_USER_DEFAULT_SORT_COLUMN;
+	}
 	
 	private void displayInfoIfNoNotesFound(final Model model, NotesPaginationData pagination) {
 		if(pagination.getNotes().size() == 0) {
@@ -332,6 +346,10 @@ public class NoteController extends AbstractController {
 	
 	private void populateModelWithEntriesPerPage(Model model) {
 		model.addAttribute(NoteControllerConstants.ModelAttrKeys.View.PAGE_SIZES, notesPageSizes);
+	}
+	
+	private void populateModelWithPageData(NotesPaginationData paginationData, Model model) {
+		model.addAttribute(PAGINATION, paginationData);
 	}
 	
 	private void createAddNotePageBreadcrumbs(Model model) {

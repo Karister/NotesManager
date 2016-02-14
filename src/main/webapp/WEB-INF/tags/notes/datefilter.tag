@@ -18,6 +18,7 @@
 								  showCalendarIcon="true" dateFormatTooltip="${dateFormatTooltip}"/>
 		<formElement:dateFilterInput path="to" clearMode="to" labelKey="notes.listing.dateFilter.label.to"
 								  showCalendarIcon="true" dateFormatTooltip="${dateFormatTooltip}"/>
+								  <form:errors path="*"/>
 	</div>
 	<button id="submitDateFilterButton">
        	<span><spring:message code="notes.listing.dateFilter.button.go"/></span>

@@ -2,29 +2,9 @@
 <mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dozer.sourceforge.net http://dozer.sourceforge.net/schema/beanmapping.xsd">
 
-	<mapping map-id="note">
+	<mapping map-id="noteMapping">
 		<class-a>pl.arczynskiadam.notesmanager.core.model.NoteModel</class-a>
 		<class-b>pl.arczynskiadam.notesmanager.web.data.NoteData</class-b>
-		<field>
-			<a>id</a>
-			<b>id</b>
-		</field>
-		<field>
-			<a>title</a>
-			<b>title</b>
-		</field>
-		<field>
-			<a>content</a>
-			<b>content</b>
-		</field>
-		<field>
-			<a>dateCreated</a>
-			<b>dateCreated</b>
-		</field>
-		<field>
-			<a>deadline</a>
-			<b>deadline</b>
-		</field>
 		<field>
 			<a>author.nick</a>
 			<b>author</b>
