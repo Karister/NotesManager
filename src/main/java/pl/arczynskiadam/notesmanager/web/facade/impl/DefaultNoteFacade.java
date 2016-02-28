@@ -69,15 +69,16 @@ public class DefaultNoteFacade implements NoteFacade {
 	
 	@Override
 	@Transactional
-	public NotesPaginationData listNotes(int pageNumber, int pageSize, String sortCol, boolean sortAsc)
+	public NotesPaginationData listNotes(int pageNumber, int pageSize, String sortCol, boolean sortAsc, DateFilterData dateFilterData)
 	{
 		NotesPaginationData notesPaginationData = new NotesPaginationData();
 		notesPaginationData.setCurrentPage(pageNumber);
 		notesPaginationData.setPageSize(pageSize);
 		notesPaginationData.setSortColumn(sortCol);
 		notesPaginationData.setSortAscending(sortAsc);
+		notesPaginationData.setDeadlineFilter(dateFilterData);
 		
-		Page<NoteModel> notesPage = buildPage(pageNumber, pageSize, sortCol, sortAsc, new DateFilterData());
+		Page<NoteModel> notesPage = buildPage(pageNumber, pageSize, sortCol, sortAsc, dateFilterData);
 				
 		NoteData nd = new NoteData();
 		

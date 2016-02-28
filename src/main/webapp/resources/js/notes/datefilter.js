@@ -23,7 +23,7 @@ DateFilterScripts = {
 	},
 	applyDateFilter: function() {
 		var form = $('#dateFilterForm');
-		window.location.href = form.attr('action') + "?from=" + form.find('input#from').val() + "&to=" + form.find('input#to').val();
+		window.location.href = form.attr('action') + '?deadline=[' + form.find('input#from').val() + '|' + form.find('input#to').val() + ']';
 	},
 	bindAll: function() {
 		with(DateFilterScripts) {

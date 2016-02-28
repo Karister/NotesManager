@@ -52,6 +52,7 @@ import pl.arczynskiadam.notesmanager.web.form.SelectedCheckboxesForm;
 import pl.arczynskiadam.notesmanager.web.form.validation.DateFilterValidator;
 import pl.arczynskiadam.notesmanager.web.form.validation.SelectedCheckboxesValidator;
 import pl.arczynskiadam.notesmanager.web.messages.GlobalMessages;
+import pl.arczynskiadam.notesmanager.web.property.editor.DateFilterDataEditor;
 import pl.arczynskiadam.notesmanager.web.tag.navigation.BreadcrumbsItem;
 
 @Controller
@@ -85,6 +86,11 @@ public class NoteController extends AbstractController {
 		binder.addValidators(dateFilterValidator);
 	}
 	
+	@InitBinder
+    public void initPropertyEditors(WebDataBinder binder) {
+        binder.registerCustomEditor(DateFilterData.class, new DateFilterDataEditor());
+    }
+	
 //	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {
 //			"!"+CLEAR_DATE_FILTER_PARAM, "!"+DATE_FILTER_FROM, "!"+DATE_FILTER_TO,
 //			"!"+PAGE_NUMBER_PARAM, "!"+PAGE_SIZE_PARAM, "!"+SORT_COLUMN_PARAM, "!"+ASCENDING_PARAM,})
@@ -114,23 +120,22 @@ public class NoteController extends AbstractController {
 		return NOTES_LISTING_PAGE;
 	}
 
-	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {DATE_FILTER_FROM, DATE_FILTER_TO})
+	@RequestMapping(value = SHOW_NOTES, method = RequestMethod.GET, params = {"deadline"})
 	public String listNotesByDate(
 			@RequestParam(PAGE_NUMBER_PARAM) Optional<Integer> pageNumber,
 			@RequestParam(PAGE_SIZE_PARAM) Optional<Integer> pageSize,
 			@RequestParam(SORT_COLUMN_PARAM) Optional<String> sortCol,
 			@RequestParam(ASCENDING_PARAM) Optional<Boolean> sortAsc,
+			@RequestParam("deadline") DateFilterData dateFilterData,
 			@ModelAttribute(SELECTED_CHECKBOXES_FORM) SelectedCheckboxesForm selectedCheckboxesForm,
 			@Valid @ModelAttribute(DATE_FILTER_FORM) DateFilterForm dateFilterForm,
 			BindingResult result,
 			HttpServletRequest request,
 			final Model model) {
 		
-		NotesPaginationData paginationData = buildPaginationData(pageNumber, pageSize, sortCol, sortAsc);
+		NotesPaginationData paginationData = buildPaginationData(pageNumber, pageSize, sortCol, sortAsc, dateFilterData);
 			
 		if (result.hasErrors()) {
-			paginationData = buildPaginationData(pageNumber, pageSize, sortCol, sortAsc);
-			
 			Set<String> selections = Utils.mapIntSetToStringSet(paginationData.getSelectedNotesIds());
 			selectedCheckboxesForm.setSelections(selections);
 			
@@ -148,7 +153,7 @@ public class NoteController extends AbstractController {
 		
 		return NOTES_LISTING_PAGE;
 	}
-
+	
 	private NotesPaginationData buildPaginationData(Optional<Integer> pageNumber, Optional<Integer> pageSize,
 			Optional<String> sortCol, Optional<Boolean> sortAsc) {
 		
@@ -156,7 +161,21 @@ public class NoteController extends AbstractController {
 				pageNumber.map(Function.identity()).orElse(DEFAULT_FIRST_PAGE),
 				pageSize.map(Function.identity()).orElse(DEFAULT_ENTRIES_PER_PAGE),
 				sortCol.map(Function.identity()).orElse(resolveSortColumn()),
-				sortAsc.map(Function.identity()).orElse(Boolean.TRUE));
+				sortAsc.map(Function.identity()).orElse(Boolean.TRUE),
+				new DateFilterData());
+		
+		return paginationData;
+	}
+	
+	private NotesPaginationData buildPaginationData(Optional<Integer> pageNumber, Optional<Integer> pageSize,
+			Optional<String> sortCol, Optional<Boolean> sortAsc, DateFilterData dateFilterData) {
+		
+		NotesPaginationData paginationData = noteFacade.listNotes(
+				pageNumber.map(Function.identity()).orElse(DEFAULT_FIRST_PAGE),
+				pageSize.map(Function.identity()).orElse(DEFAULT_ENTRIES_PER_PAGE),
+				sortCol.map(Function.identity()).orElse(resolveSortColumn()),
+				sortAsc.map(Function.identity()).orElse(Boolean.TRUE),
+				dateFilterData);
 		
 		return paginationData;
 	}
