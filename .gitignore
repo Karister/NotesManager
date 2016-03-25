@@ -3,3 +3,6 @@ target
 
 **/db.properties
 /.apt_generated/
+
+*.iml
+.idea
