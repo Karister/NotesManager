@@ -50,7 +50,7 @@ NotesGridScripts = {
 		$(".notesPageSize").each(
 			function() {
 				$(this).change(function() {
-					window.location.href = $(this).data('action') + '?size=' + $(this).val();
+					window.location.href = $(this).data('action') + '?size=' + $(this).val() + '&p=0';
 				})
 			}
 		);

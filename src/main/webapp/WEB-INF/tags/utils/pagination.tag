@@ -8,7 +8,7 @@
 <%@ attribute name="paginationData" required="true" type="pl.arczynskiadam.notesmanager.web.data.NotesPaginationData" %>
 
 <c:set var="linkCore">
-	/notesmanager/show/?${pageContext.request.queryString}
+	/notesmanager/show
 </c:set>
 
 <div class="paginationRow">
@@ -74,7 +74,7 @@
 		<span>
 			<spring:message code="notes.listing.label.pageSize"/>:
 		</span>
-		<c:url value="/notesmanager/show" var="action" />
+		<c:url value="${linkCore}" var="action"/>
 		<select class="notesPageSize" data-action="${action}">
 			<c:forEach items="${notesPageSizes}" var="size">
 				<option value="${size}"${size eq paginationData.pageSize?'selected="selected"':''}>${size}</option>

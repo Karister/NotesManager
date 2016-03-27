@@ -1,22 +1,11 @@
 package pl.arczynskiadam.notesmanager.web.tag.navigation;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
-import javax.ws.rs.core.UriBuilder;
-
-import org.apache.log4j.Logger;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.util.UrlPathHelper;
-import pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants;
-
-import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.ASCENDING_PARAM;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.SORT_COLUMN_PARAM;
-import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.THEME_PARAM;
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class SortHeaderTag extends SimpleTagSupport {
 
@@ -29,14 +18,19 @@ public class SortHeaderTag extends SimpleTagSupport {
     Integer imgSize;
 
     public void doTag() throws JspException, IOException {
-
         StringWriter sw = new StringWriter();
         getJspBody().invoke(sw);
 
         String divOpen = String.format("<div class=\"%s\">", divClass);
         String divClose = "</div>";
-        String sortAsc = getAscSortHtml();
-        String sortDesc = getDescSortHtml();
+
+        String sortAsc = String.format("<a href=\"?col=%s&asc=true\">"
+                + "<img src=\"%s\" width=\"%d\" height=\"%d\"/>"
+                + "</a>", sortColumn, ascImgUrl, imgSize, imgSize);
+
+        String sortDesc = String.format("<a href=\"?col=%s&asc=false\">"
+                + "<img src=\"%s\" width=\"%d\" height=\"%d\"/>"
+                + "</a>", sortColumn, descImgUrl, imgSize, imgSize);
 
         StringBuilder sb = new StringBuilder();
         sb.append(divOpen)
@@ -47,45 +41,6 @@ public class SortHeaderTag extends SimpleTagSupport {
 
         log.debug("writting output: " + sb.toString());
         getJspContext().getOut().println(sb.toString());
-    }
-
-    private String getAscSortHtml() {
-        return String.format("<a href=\"%s\">"
-                + "<img src=\"%s\" width=\"%d\" height=\"%d\"/>"
-                + "</a>", getAscSortUrl(), ascImgUrl, imgSize, imgSize);
-    }
-
-    private String getDescSortHtml() {
-        return String.format("<a href=\"%s\">"
-                + "<img src=\"%s\" width=\"%d\" height=\"%d\"/>"
-                + "</a>", getDescSortUrl(), descImgUrl, imgSize, imgSize);
-    }
-
-    private String getAscSortUrl() {
-        return getSortUrl(true);
-    }
-
-    private String getDescSortUrl() {
-        return getSortUrl(false);
-    }
-
-    private String getSortUrl(boolean asc) {
-        String requestUrl = getCurrentUrl();
-        return UriBuilder
-                .fromUri(requestUrl)
-                .replaceQueryParam(SORT_COLUMN_PARAM, sortColumn)
-                .replaceQueryParam(ASCENDING_PARAM, asc)
-                .replaceQueryParam(THEME_PARAM)
-                .build()
-                .toString();
-    }
-
-    private String getCurrentUrl() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        return request.getContextPath()
-                + new UrlPathHelper().getOriginatingServletPath(request)
-                + "?"
-                + request.getQueryString();
     }
 
     public String getSortColumn() {
