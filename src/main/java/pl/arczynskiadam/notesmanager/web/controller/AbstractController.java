@@ -42,7 +42,7 @@ public abstract class AbstractController {
 	 private SessionRegistryImpl sessionRegistry;
 	
 	protected void createBreadcrumpAndSaveToModel(Model model, BreadcrumbsItem... items) {
-		ArrayList<BreadcrumbsItem> navItems = new ArrayList<BreadcrumbsItem>();
+		ArrayList<BreadcrumbsItem> navItems = new ArrayList<>();
 		
 		for (BreadcrumbsItem item : items) {
 			item.setUrl(ctx.getContextPath() + item.getUrl());

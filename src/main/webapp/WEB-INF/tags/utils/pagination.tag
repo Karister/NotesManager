@@ -6,7 +6,10 @@
 <%@ taglib prefix="util" tagdir="/WEB-INF/tags/utils" %>
 
 <%@ attribute name="paginationData" required="true" type="pl.arczynskiadam.notesmanager.web.data.NotesPaginationData" %>
-<%@ attribute name="linkCore" required="true" type="java.lang.String" %>
+
+<c:set var="linkCore">
+	/notesmanager/show/?${pageContext.request.queryString}
+</c:set>
 
 <div class="paginationRow">
 	<div class="margin"></div>

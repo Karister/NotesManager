@@ -23,7 +23,7 @@
 <c:set var="isSortAsc" value="${notesPaginationData.sortAscending}"/>
 
 <c:if test="${fn:length(notesPaginationData.notes) gt 10}">
-	<utils:pagination paginationData="${notesPaginationData}" linkCore="${linkCore}" />
+	<utils:pagination paginationData="${notesPaginationData}"/>
 </c:if>
 <c:url value="/notesmanager/updateSelections.json" var="checkboxAjaxUrl" />
 <form:form id="notesGridForm" method="post" cssClass="clearfix" action="${pageContext.request.contextPath}/notesmanager/show"
@@ -57,9 +57,9 @@
 				<th class="corner"/>
 				<security:authorize ifAnyGranted="ROLE_ANONYMOUS">
 					<th>
-						<navigation:sortHeader divClass="sort" sortColumn="author" imgSize="16"
-								ascImgUrl="${sortCol eq 'author' && isSortAsc ? ascActiveImgUrl : ascImgUrl}"
-								descImgUrl="${sortCol eq 'author' && !isSortAsc ? descActiveImgUrl : descImgUrl}" >
+						<navigation:sortHeader divClass="sort" sortColumn="author.nick" imgSize="16"
+								ascImgUrl="${sortCol eq 'author.nick' && isSortAsc ? ascActiveImgUrl : ascImgUrl}"
+								descImgUrl="${sortCol eq 'author.nick' && !isSortAsc ? descActiveImgUrl : descImgUrl}" >
 							<span><spring:message code="notes.listing.label.author"/></span>
 						</navigation:sortHeader>
 					</th>
@@ -132,7 +132,7 @@
 		</tbody>
 	</table>
 	
-	<utils:pagination paginationData="${notesPaginationData}" linkCore="${linkCore}" />
+	<utils:pagination paginationData="${notesPaginationData}"/>
 	
 	<div class="buttonsRow">
 		<a href="<c:url value="/notesmanager/add" />">

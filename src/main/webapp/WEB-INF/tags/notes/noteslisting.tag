@@ -6,8 +6,6 @@
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="notes"  	 tagdir="/WEB-INF/tags/notes" %>
 
-<c:set value="/notesmanager/show/" var="linkCore" />
-
 <c:if test="${fn:length(notesPaginationData.notes) gt 0}">
 	<notes:datefilter />
 	<notes:notesgrid />

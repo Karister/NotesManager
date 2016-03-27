@@ -21,6 +21,7 @@ public interface GlobalControllerConstants {
 		public static final String DATE_FILTER_FROM			= "from";
 		public static final String DATE_FILTER_TO			= "to";
 		public static final String CLEAR_DATE_FILTER_PARAM 	= "clrDateFilter";
+		public static final String THEME_PARAM 				= "theme";
 	}
 	
 	interface ModelAttrKeys {
