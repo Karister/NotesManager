@@ -25,7 +25,7 @@
 		<form-login 
 		    login-page="/login" 
 		    default-target-url="/notesmanager/show" 
-			authentication-failure-url="/login?error" 
+			authentication-failure-url="/login?error=true"
 			username-parameter="nick"
 			password-parameter="password"
 			authentication-success-handler-ref="notesManagerLoginSuccessHandler"/>
