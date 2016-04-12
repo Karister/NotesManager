@@ -39,26 +39,27 @@ public class NoteListUrlFilter implements Filter {
     }
 
     private boolean shouldModifyUrl(HttpServletRequest request) {
-        String referrer = request.getHeader("referer");
+        String referrer = getReferrer(request);
         return referrer == null || (request).getSession().getAttribute(SELF_REDIRECTED) != null;
     }
 
     private String buildUrl(HttpServletRequest request, String requestUrl) {
-        String referrer = request.getHeader("referer");
-
+        String referrer = getReferrer(request);
         String newUrl = requestUrl;
+        
+        Map<String, String> queryParams = getQueryParams(referrer);
+        removeThemeAndlanguageParams(queryParams);
 
-        for (Map.Entry<String, String> entry : getQueryParams(referrer).entrySet()) {
+        for (Map.Entry<String, String> entry : queryParams.entrySet()) {
             if (!request.getParameterMap().containsKey(entry.getKey())) {
                 newUrl = UriBuilder.fromUri(newUrl).
-                        replaceQueryParam(entry.getKey(), getQueryParams(referrer).get(entry.getKey()))
+                        replaceQueryParam(entry.getKey(), queryParams.get(entry.getKey()))
                         .build()
                         .toString();
             }
         }
         return newUrl;
     }
-
 
     private Map<String, String> getQueryParams(String url) {
         if (!url.contains("?")) {
@@ -70,6 +71,15 @@ public class NoteListUrlFilter implements Filter {
             params.put(paramKeyValue.split("=")[0], paramKeyValue.split("=")[1]);
         }
         return params;
+    }
+
+    private void removeThemeAndlanguageParams(Map<String, String> map) {
+        map.remove("theme");
+        map.remove("lang");
+    }
+
+    private String getReferrer(HttpServletRequest request) {
+        return request.getHeader("referer");
     }
 
     @Override
