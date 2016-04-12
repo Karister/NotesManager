@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NoteListUrlFilter implements Filter {
-    final String SELF_REDIRECTED = "self-redirected";
+    private final static String SELF_REDIRECTED = "self-redirected";
 
     @Override
     public void init(FilterConfig config) throws ServletException {
@@ -20,31 +20,45 @@ public class NoteListUrlFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
         HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) res;
+
         String requestUrl = request.getRequestURI();
         if (request.getQueryString() != null) {
             requestUrl += "?" + request.getQueryString();
         }
-        String referer = request.getHeader("referer");
 
-        if (referer == null || (request).getSession().getAttribute(SELF_REDIRECTED) != null) {
+        if (shouldModifyUrl(request)) {
             ((HttpServletRequest) req).getSession().removeAttribute(SELF_REDIRECTED);
             chain.doFilter(req, res);
         } else {
-            String newUrl = requestUrl;
+            String newUrl = buildUrl(request, requestUrl);
 
-            for (Map.Entry<String, String> entry : getQueryParams(referer).entrySet()) {
-                if (!request.getParameterMap().containsKey(entry.getKey())) {
-                    newUrl = UriBuilder.fromUri(newUrl).
-                            replaceQueryParam(entry.getKey(), getQueryParams(referer).get(entry.getKey()))
-                            .build()
-                            .toString();
-                }
-            }
-
-            ((HttpServletRequest) req).getSession().setAttribute(SELF_REDIRECTED, true);
-            ((HttpServletResponse) res).sendRedirect(newUrl);
+            request.getSession().setAttribute(SELF_REDIRECTED, true);
+            response.sendRedirect(newUrl);
         }
     }
+
+    private boolean shouldModifyUrl(HttpServletRequest request) {
+        String referrer = request.getHeader("referer");
+        return referrer == null || (request).getSession().getAttribute(SELF_REDIRECTED) != null;
+    }
+
+    private String buildUrl(HttpServletRequest request, String requestUrl) {
+        String referrer = request.getHeader("referer");
+
+        String newUrl = requestUrl;
+
+        for (Map.Entry<String, String> entry : getQueryParams(referrer).entrySet()) {
+            if (!request.getParameterMap().containsKey(entry.getKey())) {
+                newUrl = UriBuilder.fromUri(newUrl).
+                        replaceQueryParam(entry.getKey(), getQueryParams(referrer).get(entry.getKey()))
+                        .build()
+                        .toString();
+            }
+        }
+        return newUrl;
+    }
+
 
     private Map<String, String> getQueryParams(String url) {
         if (!url.contains("?")) {
