@@ -1,7 +1,5 @@
 .settings
 target
-
-db.properties
 /.apt_generated/
 
 *.iml
