@@ -23,6 +23,10 @@ public interface NoteControllerConstants {
 			public static final String NOTE 	  = "note";
 		}
 	}
+
+	interface RequestParams {
+		public static final String DEADLINE_PARAM = "deadline";
+	}
 	
 	interface URLs {		
 		public static final String MANAGER			 = "/notesmanager";

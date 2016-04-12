@@ -9,6 +9,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.LANGUAGE_PARAM;
+import static pl.arczynskiadam.notesmanager.web.controller.constants.GlobalControllerConstants.RequestParams.THEME_PARAM;
+
 public class NoteListUrlFilter implements Filter {
     private final static String SELF_REDIRECTED = "self-redirected";
 
@@ -46,7 +49,7 @@ public class NoteListUrlFilter implements Filter {
     private String buildUrl(HttpServletRequest request, String requestUrl) {
         String referrer = getReferrer(request);
         String newUrl = requestUrl;
-        
+
         Map<String, String> queryParams = getQueryParams(referrer);
         removeThemeAndlanguageParams(queryParams);
 
@@ -74,8 +77,8 @@ public class NoteListUrlFilter implements Filter {
     }
 
     private void removeThemeAndlanguageParams(Map<String, String> map) {
-        map.remove("theme");
-        map.remove("lang");
+        map.remove(THEME_PARAM);
+        map.remove(LANGUAGE_PARAM);
     }
 
     private String getReferrer(HttpServletRequest request) {
